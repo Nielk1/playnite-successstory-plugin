@@ -35,6 +35,10 @@ namespace SuccessStory.Clients
         {
             return AchievementSource.None;
         }
+        public virtual bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
+        {
+            return false;
+        }
 
 
 

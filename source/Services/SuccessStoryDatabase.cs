@@ -317,37 +317,20 @@ namespace SuccessStory.Services
         {
             if (game != null && (gameAchievements?.HasAchievements ?? false))
             {
-                try
+                // TODO consider adding ranking for this loop
+                foreach (var Provider in AchievementProviders)
                 {
-                    EstimateTimeToUnlock EstimateTimeSteam = new EstimateTimeToUnlock();
-                    EstimateTimeToUnlock EstimateTimeXbox = new EstimateTimeToUnlock();
-
-                    List<TrueAchievementSearch> ListGames = TrueAchievements.SearchGame(game, OriginData.Steam);
-                    if (ListGames.Count > 0)
+                    try
                     {
-                        EstimateTimeSteam = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+                        if (Provider.Value.SetEstimateTimeToUnlock(game, gameAchievements))
+                        {
+                            break;
+                        }
                     }
-
-                    ListGames = TrueAchievements.SearchGame(game, OriginData.Xbox);
-                    if (ListGames.Count > 0)
+                    catch (Exception ex)
                     {
-                        EstimateTimeXbox = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+                        Common.LogError(ex, false, true, PluginName);
                     }
-
-                    if (EstimateTimeSteam.DataCount >= EstimateTimeXbox.DataCount)
-                    {
-                        Common.LogDebug(true, $"Get EstimateTimeSteam for {game.Name}");
-                        gameAchievements.EstimateTime = EstimateTimeSteam;
-                    }
-                    else
-                    {
-                        Common.LogDebug(true, $"Get EstimateTimeXbox for {game.Name}");
-                        gameAchievements.EstimateTime = EstimateTimeXbox;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Common.LogError(ex, false, true, PluginName);
                 }
             }
 
@@ -824,6 +807,10 @@ namespace SuccessStory.Services
             Wow,
             GenshinImpact,
             GuildWars2,
+
+
+            TEMP_TRUE,
+            TEMP_EXOPHASE,
         }
 
         public static AchievementSource GetAchievementSource(SuccessStorySettings settings, Game game, bool ignoreSpecial = false)

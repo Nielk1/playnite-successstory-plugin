@@ -4,17 +4,77 @@ using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
 using Playnite.SDK;
 using Playnite.SDK.Models;
+using SuccessStory.Models;
 using SuccessStory.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
-    class TrueAchievements
+    class TrueAchievementsFactory : IAchievementFactory
     {
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[AchievementSource.TEMP_TRUE] = new TrueAchievements();
+        }
+    }
+    class TrueAchievements : GenericAchievements
+    {
+        public override bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
+        {
+            bool updated = false;
+
+            EstimateTimeToUnlock EstimateTimeSteam = new EstimateTimeToUnlock();
+            EstimateTimeToUnlock EstimateTimeXbox = new EstimateTimeToUnlock();
+
+            List<TrueAchievementSearch> ListGames = TrueAchievements.SearchGame(game, OriginData.Steam);
+            if (ListGames.Count > 0)
+            {
+                EstimateTimeSteam = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+            }
+
+            ListGames = TrueAchievements.SearchGame(game, OriginData.Xbox);
+            if (ListGames.Count > 0)
+            {
+                EstimateTimeXbox = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+            }
+
+            if (EstimateTimeSteam.DataCount >= EstimateTimeXbox.DataCount)
+            {
+                Common.LogDebug(true, $"Get EstimateTimeSteam for {game.Name}");
+                gameAchievements.EstimateTime = EstimateTimeSteam;
+                updated = true;
+            }
+            else
+            {
+                Common.LogDebug(true, $"Get EstimateTimeXbox for {game.Name}");
+                gameAchievements.EstimateTime = EstimateTimeXbox;
+                updated = true;
+            }
+
+            return updated;
+        }
+        public override GameAchievements GetAchievements(Game game)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override bool ValidateConfiguration()
+        {
+            // The authentification is only for localised achievement
+            return true;
+        }
+        public TrueAchievements() : base("True")
+        {
+
+        }
+
+
+
         internal static readonly ILogger logger = LogManager.GetLogger();
 
         private static SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;

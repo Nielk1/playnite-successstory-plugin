@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
@@ -31,7 +32,13 @@ namespace SuccessStory.Clients
         Ubisoft,
     }
 
-
+    class ExophaseAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[AchievementSource.TEMP_EXOPHASE] = new ExophaseAchievements();
+        }
+    }
     class ExophaseAchievements : GenericAchievements
     {
         private const string UrlExophaseSearch = @"https://api.exophase.com/public/archive/games?q={0}&sort=added";
