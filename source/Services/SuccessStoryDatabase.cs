@@ -251,51 +251,58 @@ namespace SuccessStory.Services
             GameAchievements gameAchievements = GetDefault(game);
             AchievementSource achievementSource = GetAchievementSource(PluginSettings.Settings, game, true);
 
-            // Generate database only this source
-            if (VerifToAddOrShow(Plugin, PlayniteApi, PluginSettings.Settings, game))
+            if (AchievementProviders.ContainsKey(achievementSource))
             {
-                GenericAchievements achievementProvider = AchievementProviders[achievementSource];
-                RetroAchievements retroAchievementsProvider = achievementProvider as RetroAchievements;
-                PSNAchievements psnAchievementsProvider = achievementProvider as PSNAchievements;
-
-                logger.Info($"Used {achievementProvider?.ToString()} for {game?.Name} - {game?.Id}");
-
-                if (retroAchievementsProvider != null && !SuccessStory.IsFromMenu)
+                // Generate database only this source
+                if (VerifToAddOrShow(Plugin, PlayniteApi, PluginSettings.Settings, game))
                 {
-                    // use a chached RetroAchievements game ID to skip retrieving that if possible
-                    // TODO: store this with the game somehow so we don't need to get this from the achievements object
-                    GameAchievements TEMPgameAchievements = Get(game, true);
-                    ((RetroAchievements)achievementProvider).GameId = TEMPgameAchievements.RAgameID;
+                    GenericAchievements achievementProvider = AchievementProviders[achievementSource];
+                    RetroAchievements retroAchievementsProvider = achievementProvider as RetroAchievements;
+                    PSNAchievements psnAchievementsProvider = achievementProvider as PSNAchievements;
+
+                    logger.Info($"Used {achievementProvider?.ToString()} for {game?.Name} - {game?.Id}");
+
+                    if (retroAchievementsProvider != null && !SuccessStory.IsFromMenu)
+                    {
+                        // use a chached RetroAchievements game ID to skip retrieving that if possible
+                        // TODO: store this with the game somehow so we don't need to get this from the achievements object
+                        GameAchievements TEMPgameAchievements = Get(game, true);
+                        ((RetroAchievements)achievementProvider).GameId = TEMPgameAchievements.RAgameID;
+                    }
+                    else if (retroAchievementsProvider != null)
+                    {
+                        ((RetroAchievements)achievementProvider).GameId = 0;
+                    }
+
+
+                    if (psnAchievementsProvider != null && !SuccessStory.IsFromMenu)
+                    {
+                        GameAchievements TEMPgameAchievements = Get(game, true);
+                        ((PSNAchievements)achievementProvider).CommunicationId = TEMPgameAchievements.CommunicationId;
+                    }
+                    else if (psnAchievementsProvider != null)
+                    {
+                        ((PSNAchievements)achievementProvider).CommunicationId = null;
+                    }
+
+
+                    gameAchievements = achievementProvider.GetAchievements(game);
+
+                    if (retroAchievementsProvider != null)
+                    {
+                        gameAchievements.RAgameID = retroAchievementsProvider.GameId;
+                    }
+
+                    Common.LogDebug(true, $"Achievements for {game.Name} - {achievementSource} - {Serialization.ToJson(gameAchievements)}");
                 }
-                else if (retroAchievementsProvider != null)
+                else
                 {
-                    ((RetroAchievements)achievementProvider).GameId = 0;
+                    Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementSource}) - KO");
                 }
-
-
-                if (psnAchievementsProvider != null && !SuccessStory.IsFromMenu)
-                {
-                    GameAchievements TEMPgameAchievements = Get(game, true);
-                    ((PSNAchievements)achievementProvider).CommunicationId = TEMPgameAchievements.CommunicationId;
-                }
-                else if (psnAchievementsProvider != null)
-                {
-                    ((PSNAchievements)achievementProvider).CommunicationId = null;
-                }
-
-
-                gameAchievements = achievementProvider.GetAchievements(game);
-
-                if (retroAchievementsProvider != null)
-                {
-                    gameAchievements.RAgameID = retroAchievementsProvider.GameId;
-                }
-
-                Common.LogDebug(true, $"Achievements for {game.Name} - {achievementSource} - {Serialization.ToJson(gameAchievements)}");
             }
             else
             {
-                Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementSource}) - KO");
+                Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementSource}) - No Achievement Client fits constraints");
             }
 
             gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
