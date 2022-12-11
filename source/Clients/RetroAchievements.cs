@@ -15,6 +15,7 @@ using CommonPluginsShared.Models;
 using CommonPluginsShared.Extensions;
 using static CommonPluginsShared.PlayniteTools;
 using SuccessStory.Services;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
@@ -32,13 +33,32 @@ namespace SuccessStory.Clients
 
     class RetroAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.RetroAchievements] = new RetroAchievements();
+            Providers[AchievementSource.RetroAchievements] = new RetroAchievements();
         }
     }
     class RetroAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
+        {
+            // TODO With the emulator migration problem emulator.BuiltInConfigId is null
+            // TODO emulator.BuiltInConfigId = "retroarch" is limited; other emulators has RA
+            string PlatformName = game.Platforms.FirstOrDefault().Name;
+            Guid PlatformId = game.Platforms.FirstOrDefault().Id;
+            int consoleID = settings.RaConsoleAssociateds.Find(x => x.Platforms.Find(y => y.Id == PlatformId) != null)?.RaConsoleId ?? 0;
+            if (settings.EnableRetroAchievements && consoleID != 0)
+            {
+                return AchievementSource.RetroAchievements;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
+
+
         private static string BaseUrl           => @"https://retroachievements.org/API/";
         private static string BaseUrlUnlocked   => @"https://s3-eu-west-1.amazonaws.com/i.retroachievements.org/Badge/{0}.png";
         private static string BaseUrlLocked     => @"https://s3-eu-west-1.amazonaws.com/i.retroachievements.org/Badge/{0}_lock.png";
@@ -56,11 +76,11 @@ namespace SuccessStory.Clients
 
         public RetroAchievements() : base("RetroAchievements")
         {
-
+            TemporarySource = AchievementSource.RetroAchievements;
         }
 
 
-        public override GameAchievements GetAchievements(Game game)
+    public override GameAchievements GetAchievements(Game game)
         {
             GameAchievements gameAchievements = SuccessStory.PluginDatabase.GetDefault(game);
             List<Achievements> AllAchievements = new List<Achievements>();

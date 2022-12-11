@@ -9,18 +9,31 @@ using CommonPluginsStores.Origin;
 using System.Collections.ObjectModel;
 using CommonPluginsStores.Models;
 using System.Linq;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class OriginAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Origin] = new OriginAchievements();
+            Providers[AchievementSource.Origin] = new OriginAchievements();
         }
     }
     class OriginAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.OriginLibrary && settings.EnableOrigin)
+            {
+                return AchievementSource.Origin;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
         protected static OriginApi _OriginAPI;
         internal static OriginApi OriginAPI
         {
@@ -39,6 +52,7 @@ namespace SuccessStory.Clients
 
         public OriginAchievements() : base("EA", CodeLang.GetOriginLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language), CodeLang.GetOriginLangCountry(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
+            TemporarySource = AchievementSource.Origin;
             OriginAPI.SetLanguage(PluginDatabase.PlayniteApi.ApplicationSettings.Language);
         }
 

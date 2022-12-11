@@ -826,151 +826,55 @@ namespace SuccessStory.Services
             GuildWars2,
         }
 
-        private static AchievementSource GetAchievementSourceFromLibraryPlugin(SuccessStorySettings settings, Game game)
-        {
-            ExternalPlugin pluginType = PlayniteTools.GetPluginType(game.PluginId);
-            if (pluginType == ExternalPlugin.None)
-            {
-                if (game.Source?.Name?.Contains("Xbox Game Pass", StringComparison.OrdinalIgnoreCase) ?? false)
-                {
-                    return AchievementSource.Xbox;
-                }
-                if (game.Source?.Name?.Contains("Microsoft Store", StringComparison.OrdinalIgnoreCase) ?? false)
-                {
-                    return AchievementSource.Xbox;
-                }
-
-                return AchievementSource.None;
-            }
-
-            switch (pluginType)
-            {
-                case ExternalPlugin.BattleNetLibrary:
-                    switch (game.Name.ToLowerInvariant())
-                    {
-                        case "overwatch":
-                            if (settings.EnableOverwatchAchievements)
-                            {
-                                return AchievementSource.Overwatch;
-                            }
-                            break;
-                        case "starcraft 2":
-                        case "starcraft ii":
-                            if (settings.EnableSc2Achievements)
-                            {
-                                return AchievementSource.Starcraft2;
-                            }
-                            break;
-                        case "wow":
-                        case "world of warcraft":
-                            if (settings.EnableWowAchievements)
-                            {
-                                return AchievementSource.Wow;
-                            }
-                            break;
-                    }
-                    break;
-                case ExternalPlugin.GogLibrary:
-                    if (settings.EnableGog)
-                    {
-                        return AchievementSource.GOG;
-                    }
-                    break;
-                case ExternalPlugin.EpicLibrary:
-                    if (settings.EnableEpic)
-                    {
-                        return AchievementSource.Epic;
-                    }
-                    break;
-                case ExternalPlugin.OriginLibrary:
-                    if (settings.EnableOrigin)
-                    {
-                        return AchievementSource.Origin;
-                    }
-                    break;
-                case ExternalPlugin.PSNLibrary:
-                    if (settings.EnablePsn)
-                    {
-                        return AchievementSource.Playstation;
-                    }
-                    break;
-                case ExternalPlugin.SteamLibrary:
-                    if (settings.EnableSteam)
-                    {
-                        return AchievementSource.Steam;
-                    }
-                    break;
-                case ExternalPlugin.XboxLibrary:
-                    if (settings.EnableXbox)
-                    {
-                        return AchievementSource.Xbox;
-                    }
-                    break;
-            }
-            return AchievementSource.None;
-        }
-
-        private static AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
-        {
-            if (game.GameActions == null)
-            {
-                return AchievementSource.None;
-            }
-
-            foreach (GameAction action in game.GameActions)
-            {
-                if (!action.IsPlayAction || action.EmulatorId == Guid.Empty)
-                {
-                    continue;
-                }
-
-                Emulator emulator = API.Instance.Database.Emulators.FirstOrDefault(e => e.Id == action.EmulatorId);
-                if (emulator == null)
-                {
-                    continue;
-                }
-
-                if (PlayniteTools.GameUseRpcs3(game) && settings.EnableRpcs3Achievements)
-                {
-                    return AchievementSource.RPCS3;
-                }
-
-                // TODO With the emulator migration problem emulator.BuiltInConfigId is null
-                // TODO emulator.BuiltInConfigId = "retroarch" is limited; other emulators has RA
-                string PlatformName = game.Platforms.FirstOrDefault().Name;
-                Guid PlatformId = game.Platforms.FirstOrDefault().Id;
-                int consoleID = settings.RaConsoleAssociateds.Find(x => x.Platforms.Find(y => y.Id == PlatformId) != null)?.RaConsoleId ?? 0;
-                if (settings.EnableRetroAchievements && consoleID != 0)
-                {
-                    return AchievementSource.RetroAchievements;
-                }
-            }
-
-            return AchievementSource.None;
-        }
-
         public static AchievementSource GetAchievementSource(SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            if (game.Name.IsEqual("Genshin Impact") && !ignoreSpecial)
+            foreach (var Provider in AchievementProviders)
             {
-                return AchievementSource.GenshinImpact;
+                AchievementSource candidateSource = Provider.Value.CheckAchivementSourceGameNameOnly(game.Name, ignoreSpecial);
+                if (candidateSource != AchievementSource.None)
+                {
+                    return candidateSource;
+                }
             }
 
-            if (game.Name.IsEqual("Guild Wars 2"))
+            ExternalPlugin pluginType = PlayniteTools.GetPluginType(game.PluginId);
+            foreach (var Provider in AchievementProviders)
             {
-                return AchievementSource.GuildWars2;
+                AchievementSource candidateSource = Provider.Value.GetAchievementSourceFromLibraryPlugin(pluginType, settings, game);
+                if (candidateSource != AchievementSource.None)
+                {
+                    return candidateSource;
+                }
             }
 
-            AchievementSource source = GetAchievementSourceFromLibraryPlugin(settings, game);
-            if (source != AchievementSource.None)
-            {
-                return source;
-            }
 
-            source = GetAchievementSourceFromEmulator(settings, game);
-            if (source != AchievementSource.None)
+            if (game.GameActions != null)
             {
-                return source;
+                foreach (GameAction action in game.GameActions)
+                {
+                    if (!action.IsPlayAction || action.EmulatorId == Guid.Empty)
+                    {
+                        continue;
+                    }
+
+                    Emulator emulator = API.Instance.Database.Emulators.FirstOrDefault(e => e.Id == action.EmulatorId);
+                    if (emulator == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var Provider in AchievementProviders)
+                    {
+
+                        AchievementSource candidateSource = Provider.Value.GetAchievementSourceFromEmulator(settings, game);
+                        if (candidateSource != AchievementSource.None)
+                        {
+                            return candidateSource;
+                        }
+                    }
+                }
+
+                return AchievementSource.None;
             }
 
             //any game can still get local achievements when that's enabled

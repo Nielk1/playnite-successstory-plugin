@@ -8,18 +8,32 @@ using System.Linq;
 using MoreLinq;
 using System.Text;
 using System.Threading.Tasks;
+using static SuccessStory.Services.SuccessStoryDatabase;
+using CommonPluginsShared.Extensions;
 
 namespace SuccessStory.Clients
 {
     class GuildWars2AchivementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.GuildWars2] = new GuildWars2Achievements();
+            Providers[AchievementSource.GuildWars2] = new GuildWars2Achievements();
         }
     }
     class GuildWars2Achievements : GenericAchievements
     {
+        public override AchievementSource CheckAchivementSourceGameNameOnly(string name, bool ignoreSpecial)
+        {
+            if (name.IsEqual("Guild Wars 2"))
+            {
+                return AchievementSource.GuildWars2;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
         private const string UrlApiOwnedAchievements = @"https://api.guildwars2.com/v2/account/achievements";
         private const string UrlApiAchievementsList = @"https://api.guildwars2.com/v2/achievements";
         private const string UrlApiAchievements = UrlApiAchievementsList + @"?ids={0}&lang={1}";
@@ -28,7 +42,7 @@ namespace SuccessStory.Clients
 
         public GuildWars2Achievements() : base("GuildWars2", CodeLang.GetOriginLangCountry(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-            
+            TemporarySource = AchievementSource.GuildWars2;
         }
 
 

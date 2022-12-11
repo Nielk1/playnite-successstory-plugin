@@ -15,18 +15,48 @@ using CommonPluginsShared.Models;
 using CommonPlayniteShared.PluginLibrary.XboxLibrary;
 using CommonPluginsShared.Extensions;
 using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class XboxAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Xbox] = new XboxAchievements();
+            Providers[AchievementSource.Xbox] = new XboxAchievements();
         }
     }
     class XboxAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.None)
+            {
+                if (game.Source?.Name?.Contains("Xbox Game Pass", StringComparison.OrdinalIgnoreCase) ?? false)
+                {
+                    return AchievementSource.Xbox;
+                }
+                if (game.Source?.Name?.Contains("Microsoft Store", StringComparison.OrdinalIgnoreCase) ?? false)
+                {
+                    return AchievementSource.Xbox;
+                }
+
+                return AchievementSource.None;
+            }
+
+            if (pluginType == ExternalPlugin.XboxLibrary && settings.EnableXbox)
+            {
+                return AchievementSource.Xbox;
+            }
+
+            return AchievementSource.None;
+        }
+
+
+
+
+
+
         protected static XboxAccountClient _XboxAccountClient;
         internal static XboxAccountClient XboxAccountClient
         {
@@ -54,7 +84,7 @@ namespace SuccessStory.Clients
 
         public XboxAchievements() : base("Xbox", CodeLang.GetXboxLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-
+            TemporarySource = AchievementSource.Xbox;
         }
 
 
@@ -105,7 +135,7 @@ namespace SuccessStory.Clients
             if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, Services.SuccessStoryDatabase.AchievementSource.Xbox);
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Xbox);
             }
 
 

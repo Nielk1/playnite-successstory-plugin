@@ -2,28 +2,44 @@
 using System.Collections.Generic;
 using System.Linq;
 using CommonPluginsShared;
+using CommonPluginsShared.Extensions;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 using SuccessStory.Models;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class GenshinImpactAchivementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.GenshinImpact] = new GenshinImpactAchievements();
+            Providers[AchievementSource.GenshinImpact] = new GenshinImpactAchievements();
         }
     }
     class GenshinImpactAchievements : GenericAchievements
     {
+        public override AchievementSource CheckAchivementSourceGameNameOnly(string name, bool ignoreSpecial)
+        {
+            if (name.IsEqual("Genshin Impact") && !ignoreSpecial)
+            {
+                return AchievementSource.GenshinImpact;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
+
+
         private static string UrlTextMap                => @"https://raw.githubusercontent.com/theBowja/GenshinData-1/master/TextMap/TextMap{0}.json";
         private static string UrlAchievementsCategory   => @"https://raw.githubusercontent.com/theBowja/GenshinData-1/master/ExcelBinOutput/AchievementGoalExcelConfigData.json";
         private static string UrlAchievements           => @"https://raw.githubusercontent.com/theBowja/GenshinData-1/master/ExcelBinOutput/AchievementExcelConfigData.json";
 
         public GenshinImpactAchievements() : base("GenshinImpact", CodeLang.GetGenshinLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-
+            TemporarySource = AchievementSource.GenshinImpact;
         }
 
 

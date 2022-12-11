@@ -8,18 +8,33 @@ using CommonPluginsStores.Gog;
 using System.Collections.ObjectModel;
 using CommonPluginsStores.Models;
 using System.Collections.Generic;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class GogAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.GOG] = new GogAchievements();
+            Providers[AchievementSource.GOG] = new GogAchievements();
         }
     }
     class GogAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.GogLibrary && settings.EnableGog)
+            {
+                return AchievementSource.GOG;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
+
+
         protected static GogApi _GogAPI;
         internal static GogApi GogAPI
         {
@@ -38,6 +53,7 @@ namespace SuccessStory.Clients
 
         public GogAchievements() : base("GOG", CodeLang.GetGogLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
+            TemporarySource = AchievementSource.GOG;
             GogAPI.SetLanguage(PluginDatabase.PlayniteApi.ApplicationSettings.Language);
         }
 

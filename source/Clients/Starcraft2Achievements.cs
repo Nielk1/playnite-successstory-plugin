@@ -12,18 +12,40 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class Starcraft2AchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Starcraft2] = new Starcraft2Achievements();
+            Providers[AchievementSource.Starcraft2] = new Starcraft2Achievements();
         }
     }
     internal class Starcraft2Achievements : BattleNetAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.BattleNetLibrary)
+            {
+                switch (game.Name.ToLowerInvariant())
+                {
+                    case "starcraft 2":
+                    case "starcraft ii":
+                        if (settings.EnableSc2Achievements)
+                        {
+                            return AchievementSource.Starcraft2;
+                        }
+                        break;
+                }
+            }
+
+            return AchievementSource.None;
+        }
+
+
+
         private string UserSc2Id = string.Empty;
 
         private const string UrlStarCraft2 = @"https://starcraft2.com/";
@@ -36,7 +58,7 @@ namespace SuccessStory.Clients
 
         public Starcraft2Achievements() : base("Starcraft 2", PluginDatabase.PlayniteApi.ApplicationSettings.Language)
         {
-
+            TemporarySource = AchievementSource.Starcraft2;
         }
 
 
@@ -132,7 +154,7 @@ namespace SuccessStory.Clients
             if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, Services.SuccessStoryDatabase.AchievementSource.Starcraft2);
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Starcraft2);
             }
 
 

@@ -9,21 +9,34 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using CommonPluginsShared.Extensions;
 using Playnite.SDK;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class Rpcs3AchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.RPCS3] = new Rpcs3Achievements();
+            Providers[AchievementSource.RPCS3] = new Rpcs3Achievements();
         }
     }
     class Rpcs3Achievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
+        {
+            if (PlayniteTools.GameUseRpcs3(game) && settings.EnableRpcs3Achievements)
+            {
+                return AchievementSource.RPCS3;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
         public Rpcs3Achievements() : base("RPCS3")
         {
-
+            TemporarySource = AchievementSource.RPCS3;
         }
 
 

@@ -12,19 +12,32 @@ using System.Globalization;
 using CommonPluginsShared.Extensions;
 using CommonPlayniteShared.PluginLibrary.PSNLibrary.Models;
 using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class PSNAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Playstation] = new PSNAchievements();
+            Providers[AchievementSource.Playstation] = new PSNAchievements();
         }
     }
     // https://andshrew.github.io/PlayStation-Trophies/#/APIv2
     class PSNAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.GogLibrary && settings.EnablePsn)
+            {
+                return AchievementSource.Playstation;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
         protected static PsnAllTrophies _PsnAllTrophies;
         internal static PsnAllTrophies PsnAllTrophies
         {
@@ -67,6 +80,7 @@ namespace SuccessStory.Clients
 
         public PSNAchievements() : base("PSN", CodeLang.GetEpicLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
+            TemporarySource = AchievementSource.Playstation;
             PsnDataPath = PluginDatabase.Paths.PluginUserDataPath + "\\..\\e4ac81cb-1b1a-4ec9-8639-9a9633989a71";
         }
 

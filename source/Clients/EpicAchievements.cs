@@ -10,11 +10,24 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class EpicAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.EpicLibrary && settings.EnableEpic)
+            {
+                return AchievementSource.Epic;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
         protected static EpicApi _EpicAPI;
         internal static EpicApi EpicAPI
         {
@@ -33,6 +46,7 @@ namespace SuccessStory.Clients
 
         public EpicAchievements() : base("Epic", CodeLang.GetEpicLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language), CodeLang.GetGogLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
+            TemporarySource = AchievementSource.Epic;
             EpicAPI.SetLanguage(PluginDatabase.PlayniteApi.ApplicationSettings.Language);
         }
 

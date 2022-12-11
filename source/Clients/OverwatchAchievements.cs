@@ -14,18 +14,40 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class OverwatchAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Overwatch] = new OverwatchAchievements();
+            Providers[AchievementSource.Overwatch] = new OverwatchAchievements();
         }
     }
     internal class OverwatchAchievements : BattleNetAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.BattleNetLibrary)
+            {
+                switch (game.Name.ToLowerInvariant())
+                {
+                    case "overwatch":
+                        if (settings.EnableOverwatchAchievements)
+                        {
+                            return AchievementSource.Overwatch;
+                        }
+                        break;
+                }
+            }
+
+            return AchievementSource.None;
+        }
+
+
+
+
         private const string UrlOverwatchProfil = @"https://playoverwatch.com";
         private string UrlOverwatchLogin = $"{UrlOverwatchProfil}/login";
         private string UrlOverwatchProfilLocalised = $"{UrlOverwatchProfil}/" + "{0}";
@@ -70,6 +92,7 @@ namespace SuccessStory.Clients
 
         public OverwatchAchievements() : base("Overwatch", CodeLang.GetEpicLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
+            TemporarySource = AchievementSource.Overwatch;
             UrlOverwatchProfilLocalised = string.Format(UrlOverwatchProfilLocalised, LocalLang);
         }
 
@@ -178,7 +201,7 @@ namespace SuccessStory.Clients
             if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, Services.SuccessStoryDatabase.AchievementSource.Overwatch);
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Overwatch);
             }
 
 

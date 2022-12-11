@@ -12,15 +12,32 @@ using System.Text;
 using System.Security.Principal;
 using CommonPlayniteShared.Common;
 using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     interface IAchievementFactory
     {
-        void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers);
+        void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers);
     }
     abstract class GenericAchievements
     {
+        internal AchievementSource TemporarySource { get; set; }
+        public virtual AchievementSource CheckAchivementSourceGameNameOnly(string name, bool ignoreSpecial)
+        {
+            return AchievementSource.None;
+        }
+        public virtual AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            return AchievementSource.None;
+        }
+        public virtual AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
+        {
+            return AchievementSource.None;
+        }
+
+
+
         internal static ILogger logger => LogManager.GetLogger();
         internal static IResourceProvider resources => new ResourceProvider();
 

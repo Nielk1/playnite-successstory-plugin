@@ -23,19 +23,33 @@ using CommonPluginsShared.Extensions;
 using System.Threading;
 using CommonPluginsStores.Steam;
 using CommonPluginsStores.Steam.Models;
+using static SuccessStory.Services.SuccessStoryDatabase;
+using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
     class SteamAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Steam] = new SteamAchievements();
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Local] = SteamAchievements.GetLocalSteamAchievementsProvider();
+            Providers[AchievementSource.Steam] = new SteamAchievements();
+            Providers[AchievementSource.Local] = SteamAchievements.GetLocalSteamAchievementsProvider();
         }
     }
     class SteamAchievements : GenericAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.SteamLibrary && settings.EnableSteam)
+            {
+                return AchievementSource.Steam;
+            }
+            return AchievementSource.None;
+        }
+
+
+
+
         protected static SteamApi _steamApi;
         internal static SteamApi steamApi
         {
@@ -71,7 +85,7 @@ namespace SuccessStory.Clients
 
         public SteamAchievements() : base("Steam", CodeLang.GetSteamLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-
+            TemporarySource = AchievementSource.Steam;
         }
 
 
@@ -239,7 +253,7 @@ namespace SuccessStory.Clients
                 });
 
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetMissingDescription(gameAchievements, Services.SuccessStoryDatabase.AchievementSource.Steam);
+                exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSource.Steam);
             }
 
             return gameAchievements;
@@ -337,7 +351,7 @@ namespace SuccessStory.Clients
             if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetMissingDescription(gameAchievements, Services.SuccessStoryDatabase.AchievementSource.Steam);
+                exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSource.Steam);
             }
 
             return gameAchievements;
@@ -1470,6 +1484,7 @@ namespace SuccessStory.Clients
         {
             var provider = new SteamAchievements();
             provider.SetLocal();
+            provider.TemporarySource = AchievementSource.Steam;
             return provider;
         }
         #endregion

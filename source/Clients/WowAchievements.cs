@@ -6,18 +6,42 @@ using SuccessStory.Models;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using static CommonPluginsShared.PlayniteTools;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
     class WowAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
         {
-            Providers[Services.SuccessStoryDatabase.AchievementSource.Wow] = new WowAchievements();
+            Providers[AchievementSource.Wow] = new WowAchievements();
         }
     }
     internal class WowAchievements : BattleNetAchievements
     {
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.BattleNetLibrary)
+            {
+                switch (game.Name.ToLowerInvariant())
+                {
+                    case "wow":
+                    case "world of warcraft":
+                        if (settings.EnableWowAchievements)
+                        {
+                            return AchievementSource.Wow;
+                        }
+                        break;
+                }
+            }
+
+            return AchievementSource.None;
+        }
+
+
+
+
         private static string UrlWowGraphQL => @"https://worldofwarcraft.com/graphql";
         private static string UrlWowBase    => @"https://worldofwarcraft.com/{0}/character/{1}/{2}/{3}/achievements/";
         private static string UrlWowBaseLocalised { get; set; }
@@ -40,7 +64,7 @@ namespace SuccessStory.Clients
 
         public WowAchievements() : base("Wow", CodeLang.GetEpicLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-
+            TemporarySource = AchievementSource.Wow;
         }
 
 
@@ -120,7 +144,7 @@ namespace SuccessStory.Clients
             if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, Services.SuccessStoryDatabase.AchievementSource.Overwatch);
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Overwatch);
             }
 
 
