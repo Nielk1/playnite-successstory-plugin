@@ -9,6 +9,13 @@ using System.Net;
 
 namespace SuccessStory.Clients
 {
+    class WowAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Wow] = new WowAchievements();
+        }
+    }
     internal class WowAchievements : BattleNetAchievements
     {
         private static string UrlWowGraphQL => @"https://worldofwarcraft.com/graphql";

@@ -18,6 +18,13 @@ using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
+    class XboxAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Xbox] = new XboxAchievements();
+        }
+    }
     class XboxAchievements : GenericAchievements
     {
         protected static XboxAccountClient _XboxAccountClient;

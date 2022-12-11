@@ -15,6 +15,10 @@ using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
+    interface IAchievementFactory
+    {
+        void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers);
+    }
     abstract class GenericAchievements
     {
         internal static ILogger logger => LogManager.GetLogger();

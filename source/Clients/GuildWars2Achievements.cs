@@ -11,6 +11,13 @@ using System.Threading.Tasks;
 
 namespace SuccessStory.Clients
 {
+    class GuildWars2AchivementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.GuildWars2] = new GuildWars2Achievements();
+        }
+    }
     class GuildWars2Achievements : GenericAchievements
     {
         private const string UrlApiOwnedAchievements = @"https://api.guildwars2.com/v2/account/achievements";

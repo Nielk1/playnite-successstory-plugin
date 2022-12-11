@@ -21,6 +21,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using static CommonPluginsShared.PlayniteTools;
 using CommonPluginsShared.Extensions;
+using System.Reflection;
 
 namespace SuccessStory.Services
 {
@@ -40,22 +41,35 @@ namespace SuccessStory.Services
                 {
                     if (_achievementProviders == null)
                     {
-                        _achievementProviders = new Dictionary<AchievementSource, GenericAchievements> {
-                            { AchievementSource.GOG, new GogAchievements() },
-                            { AchievementSource.Epic, new EpicAchievements() },
-                            { AchievementSource.Origin, new OriginAchievements() },
-                            { AchievementSource.Overwatch, new OverwatchAchievements() },
-                            { AchievementSource.Wow, new WowAchievements() },
-                            { AchievementSource.Playstation, new PSNAchievements() },
-                            { AchievementSource.RetroAchievements, new RetroAchievements() },
-                            { AchievementSource.RPCS3, new Rpcs3Achievements() },
-                            { AchievementSource.Starcraft2, new Starcraft2Achievements() },
-                            { AchievementSource.Steam, new SteamAchievements() },
-                            { AchievementSource.Xbox, new XboxAchievements() },
-                            { AchievementSource.GenshinImpact, new GenshinImpactAchievements() },
-                            { AchievementSource.GuildWars2, new GuildWars2Achievements() },
-                            { AchievementSource.Local, SteamAchievements.GetLocalSteamAchievementsProvider() }
-                        };
+                        _achievementProviders = new Dictionary<AchievementSource, GenericAchievements>();
+
+                        // for now just scan ourself, we might be able to dynamicly load from other plugins but we'd need to remove all tight coupling first
+                        foreach (Type item in typeof(IAchievementFactory).GetTypeInfo().Assembly.GetTypes())
+                        {
+                            if (item.GetInterfaces().Contains(typeof(IAchievementFactory)))
+                            {
+                                ConstructorInfo[] cons = item.GetConstructors();
+                                foreach (ConstructorInfo con in cons)
+                                {
+                                    try
+                                    {
+                                        /*ParameterInfo[] @params = con.GetParameters();
+                                        object[] paramList = new object[@params.Length];
+                                        for (int i = 0; i < @params.Length; i++)
+                                        {
+                                            paramList[i] = ServiceProvider.GetService(@params[i].ParameterType);
+                                        }
+
+                                        IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item, paramList);
+                                        */
+                                        IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item);
+                                        plugin.BuildClient(_achievementProviders);
+                                    }
+                                    catch { }
+                                }
+                            }
+                        }
+
                     }
                 }
                 return _achievementProviders;

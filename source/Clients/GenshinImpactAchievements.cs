@@ -8,6 +8,13 @@ using SuccessStory.Models;
 
 namespace SuccessStory.Clients
 {
+    class GenshinImpactAchivementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.GenshinImpact] = new GenshinImpactAchievements();
+        }
+    }
     class GenshinImpactAchievements : GenericAchievements
     {
         private static string UrlTextMap                => @"https://raw.githubusercontent.com/theBowja/GenshinData-1/master/TextMap/TextMap{0}.json";

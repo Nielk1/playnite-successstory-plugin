@@ -10,7 +10,14 @@ using CommonPluginsStores.Models;
 using System.Collections.Generic;
 
 namespace SuccessStory.Clients
-{    
+{
+    class GogAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.GOG] = new GogAchievements();
+        }
+    }
     class GogAchievements : GenericAchievements
     {
         protected static GogApi _GogAPI;

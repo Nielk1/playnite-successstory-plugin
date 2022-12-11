@@ -12,6 +12,13 @@ using System.Linq;
 
 namespace SuccessStory.Clients
 {
+    class OriginAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Origin] = new OriginAchievements();
+        }
+    }
     class OriginAchievements : GenericAchievements
     {
         protected static OriginApi _OriginAPI;

@@ -17,6 +17,13 @@ using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
+    class OverwatchAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Overwatch] = new OverwatchAchievements();
+        }
+    }
     internal class OverwatchAchievements : BattleNetAchievements
     {
         private const string UrlOverwatchProfil = @"https://playoverwatch.com";

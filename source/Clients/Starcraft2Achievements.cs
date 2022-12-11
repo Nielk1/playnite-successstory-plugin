@@ -15,6 +15,13 @@ using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
+    class Starcraft2AchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Starcraft2] = new Starcraft2Achievements();
+        }
+    }
     internal class Starcraft2Achievements : BattleNetAchievements
     {
         private string UserSc2Id = string.Empty;

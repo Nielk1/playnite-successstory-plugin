@@ -26,6 +26,14 @@ using CommonPluginsStores.Steam.Models;
 
 namespace SuccessStory.Clients
 {
+    class SteamAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Steam] = new SteamAchievements();
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Local] = SteamAchievements.GetLocalSteamAchievementsProvider();
+        }
+    }
     class SteamAchievements : GenericAchievements
     {
         protected static SteamApi _steamApi;

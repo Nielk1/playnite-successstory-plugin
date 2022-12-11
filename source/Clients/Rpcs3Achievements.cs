@@ -12,6 +12,13 @@ using Playnite.SDK;
 
 namespace SuccessStory.Clients
 {
+    class Rpcs3AchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.RPCS3] = new Rpcs3Achievements();
+        }
+    }
     class Rpcs3Achievements : GenericAchievements
     {
         public Rpcs3Achievements() : base("RPCS3")

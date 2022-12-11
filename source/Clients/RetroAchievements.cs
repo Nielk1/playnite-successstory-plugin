@@ -30,6 +30,13 @@ namespace SuccessStory.Clients
     }
 
 
+    class RetroAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.RetroAchievements] = new RetroAchievements();
+        }
+    }
     class RetroAchievements : GenericAchievements
     {
         private static string BaseUrl           => @"https://retroachievements.org/API/";

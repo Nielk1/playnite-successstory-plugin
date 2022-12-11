@@ -15,6 +15,13 @@ using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
+    class PSNAchievementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<Services.SuccessStoryDatabase.AchievementSource, GenericAchievements> Providers)
+        {
+            Providers[Services.SuccessStoryDatabase.AchievementSource.Playstation] = new PSNAchievements();
+        }
+    }
     // https://andshrew.github.io/PlayStation-Trophies/#/APIv2
     class PSNAchievements : GenericAchievements
     {
