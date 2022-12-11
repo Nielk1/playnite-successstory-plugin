@@ -965,9 +965,18 @@ namespace SuccessStory.Services
 
             if (loadedItem.IsManual)
             {
-                if (game.Name.IsEqual("Genshin Impact"))
+                GenericAchievements ProviderWithOverride = null;
+                foreach (var Provider in AchievementProviders)
                 {
-                    webItem = RefreshGenshinImpact(game);
+                    if(Provider.Value.HasManualMenuOverride(PlayniteApi, PluginSettings, game))
+                    {
+                        ProviderWithOverride = Provider.Value;
+                        break;
+                    }
+                }
+                if (ProviderWithOverride != null)
+                {
+                    webItem = ProviderWithOverride.RefreshManualOverrideData(game);
                 }
                 else
                 {

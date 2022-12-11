@@ -40,6 +40,10 @@ namespace SuccessStory.Clients
             }
             return null;
         }
+        public override bool HasManualMenuOverride(IPlayniteAPI playniteApi, SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
+        {
+            return gameMenu.Name.IsEqual("Genshin Impact");
+        }
         public override bool BuildManualMenuOverride(IPlayniteAPI playniteApi, SuccessStorySettingsViewModel pluginSettings, GameAchievements gameAchievements, Game gameMenu, List<GameMenuItem> gameMenuItems)
         {
             if (gameMenu.Name.IsEqual("Genshin Impact"))
@@ -91,7 +95,23 @@ namespace SuccessStory.Clients
             }
             return false;
         }
+        public GameAchievements RefreshManualOverrideData(Game game)
+        {
+            logger.Info($"RefreshGenshinImpact({game?.Name} - {game?.Id})");
+            GameAchievements gameAchievements = null;
 
+            try
+            {
+                GenshinImpactAchievements genshinImpactAchievements = new GenshinImpactAchievements();
+                gameAchievements = genshinImpactAchievements.GetAchievements(game);
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+
+            return gameAchievements;
+        }
 
 
 

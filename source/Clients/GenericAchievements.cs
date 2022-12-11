@@ -44,11 +44,18 @@ namespace SuccessStory.Clients
         {
             return null;
         }
+        public virtual bool HasManualMenuOverride(IPlayniteAPI playniteApi, SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
+        {
+            return false;
+        }
         public virtual bool BuildManualMenuOverride(IPlayniteAPI playniteApi, SuccessStorySettingsViewModel pluginSettings, GameAchievements gameAchievements, Game gameMenu, List<GameMenuItem> gameMenuItems)
         {
             return false;
         }
-
+        public virtual GameAchievements RefreshManualOverrideData(Game game)
+        {
+            return null;
+        }
 
 
 
