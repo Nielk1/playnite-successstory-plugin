@@ -28,6 +28,7 @@ using System.Diagnostics;
 using QuickSearch.SearchItems;
 using CommonPluginsStores.Steam;
 using SuccessStory.Clients;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory
 {
@@ -385,19 +386,16 @@ namespace SuccessStory
 
                                 if (PluginDatabase.PluginSettings.Settings.EnableOneGameView)
                                 {
-                                    if (PluginDatabase.GameContext.Name.IsEqual("overwatch") && (PluginDatabase.GameContext.Source?.Name?.IsEqual("battle.net") ?? false))
+                                    foreach (var Provider in AchievementProviders)
                                     {
-                                        ViewExtension = new SuccessStoryOverwatchView(GameMenu);
+                                        ViewExtension = Provider.Value.GetOneGameView(PluginSettings, GameMenu);
+                                        if (ViewExtension != null)
+                                        {
+                                            break;
+                                        }
                                     }
-                                    else if (PluginSettings.Settings.EnableGenshinImpact && GameMenu.Name.IsEqual("Genshin Impact"))
-                                    {
-                                        ViewExtension = new SuccessStoryCategoryView(GameMenu);
-                                    }
-                                    else if (PluginSettings.Settings.EnableGuildWars2 && GameMenu.Name.IsEqual("Guild Wars 2"))
-                                    {
-                                        ViewExtension = new SuccessStoryCategoryView(GameMenu);
-                                    }
-                                    else 
+
+                                    if (ViewExtension == null)
                                     {
                                         ViewExtension = new SuccessStoryOneGameView(GameMenu);
                                     }
@@ -465,7 +463,16 @@ namespace SuccessStory
                     }
                 }
 
-                if (PluginSettings.Settings.EnableManual && !GameMenu.Name.IsEqual("Genshin Impact"))
+                bool DidManualOverride = false;
+                foreach (var Provider in AchievementProviders)
+                {
+                    DidManualOverride = Provider.Value.BuildManualMenuOverride(PlayniteApi, PluginSettings, gameAchievements, GameMenu, gameMenuItems);
+                    if(DidManualOverride)
+                    {
+                        break;
+                    }    
+                }
+                if (PluginSettings.Settings.EnableManual && !DidManualOverride)
                 {
                     if (!gameAchievements.HasData)
                     {
@@ -506,53 +513,6 @@ namespace SuccessStory
                                 });
                             }
                         });
-                    }
-                }
-
-                if (GameMenu.Name.IsEqual("Genshin Impact"))
-                {
-                    if (PluginSettings.Settings.EnableGenshinImpact)
-                    {
-                        if (!gameAchievements.HasData)
-                        {
-                            gameMenuItems.Add(new GameMenuItem
-                            {
-                                MenuSection = resources.GetString("LOCSuccessStory"),
-                                Description = resources.GetString("LOCAddGenshinImpact"),
-                                Action = (mainMenuItem) =>
-                                {
-                                    PluginDatabase.Remove(GameMenu);
-                                    PluginDatabase.GetGenshinImpact(GameMenu);
-                                }
-                            });
-                        }
-                        else
-                        {
-                            gameMenuItems.Add(new GameMenuItem
-                            {
-                                MenuSection = resources.GetString("LOCSuccessStory"),
-                                Description = resources.GetString("LOCEditGame"),
-                                Action = (mainMenuItem) =>
-                                {
-                                    var ViewExtension = new SuccessStoryEditManual(GameMenu);
-                                    Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCSuccessStory"), ViewExtension);
-                                    windowExtension.ShowDialog();
-                                }
-                            });
-
-                            gameMenuItems.Add(new GameMenuItem
-                            {
-                                MenuSection = resources.GetString("LOCSuccessStory"),
-                                Description = resources.GetString("LOCRemoveTitle"),
-                                Action = (gameMenuItem) =>
-                                {
-                                    var TaskIntegrationUI = Task.Run(() =>
-                                    {
-                                        PluginDatabase.Remove(GameMenu);
-                                    });
-                                }
-                            });
-                        }
                     }
                 }
 

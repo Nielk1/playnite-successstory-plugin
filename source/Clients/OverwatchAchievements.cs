@@ -6,6 +6,7 @@ using CommonPluginsShared.Models;
 using Playnite.SDK;
 using Playnite.SDK.Models;
 using SuccessStory.Models;
+using SuccessStory.Views;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -44,6 +45,17 @@ namespace SuccessStory.Clients
 
             return AchievementSource.None;
         }
+        public override dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
+        {
+            if (PluginDatabase.GameContext.Name.IsEqual("overwatch") && (PluginDatabase.GameContext.Source?.Name?.IsEqual("battle.net") ?? false))
+            {
+                return new SuccessStoryOverwatchView(gameMenu);
+            }
+            return null;
+        }
+
+
+
 
 
 

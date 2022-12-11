@@ -16,6 +16,9 @@ using CommonPluginsShared.Extensions;
 using static CommonPluginsShared.PlayniteTools;
 using SuccessStory.Services;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using Playnite.SDK.Plugins;
+using System.Windows;
+using Playnite.SDK;
 
 namespace SuccessStory.Clients
 {

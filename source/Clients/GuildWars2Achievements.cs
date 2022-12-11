@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using CommonPluginsShared.Extensions;
+using SuccessStory.Views;
 
 namespace SuccessStory.Clients
 {
@@ -30,6 +31,18 @@ namespace SuccessStory.Clients
             }
             return AchievementSource.None;
         }
+        public override dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
+        {
+            if (pluginSettings.Settings.EnableGuildWars2 && gameMenu.Name.IsEqual("Guild Wars 2"))
+            {
+                return new SuccessStoryCategoryView(gameMenu);
+            }
+            return null;
+        }
+
+
+
+
 
 
 

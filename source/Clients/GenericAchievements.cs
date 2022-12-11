@@ -13,6 +13,7 @@ using System.Security.Principal;
 using CommonPlayniteShared.Common;
 using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using Playnite.SDK.Plugins;
 
 namespace SuccessStory.Clients
 {
@@ -39,6 +40,18 @@ namespace SuccessStory.Clients
         {
             return false;
         }
+        public virtual dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
+        {
+            return null;
+        }
+        public virtual bool BuildManualMenuOverride(IPlayniteAPI playniteApi, SuccessStorySettingsViewModel pluginSettings, GameAchievements gameAchievements, Game gameMenu, List<GameMenuItem> gameMenuItems)
+        {
+            return false;
+        }
+
+
+
+
 
 
 
