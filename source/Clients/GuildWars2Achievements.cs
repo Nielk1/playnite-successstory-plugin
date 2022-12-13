@@ -16,7 +16,7 @@ namespace SuccessStory.Clients
 {
     class GuildWars2AchivementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.GuildWars2] = new GuildWars2Achievements();
         }

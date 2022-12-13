@@ -3,6 +3,7 @@ using Playnite.SDK;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 using SuccessStory.Clients;
+using SuccessStory.Controls;
 using SuccessStory.Models;
 using SuccessStory.Services;
 using System;
@@ -21,6 +22,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Views
 {
@@ -42,12 +44,30 @@ namespace SuccessStory.Views
         private SteamAchievements steamAchievements = new SteamAchievements();
         private ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
 
+        private Dictionary<AchievementSource, ISearchableManualAchievements> searchProviders;
+        private List<AchievementProviderRadioButton> searchProviderButtons;
 
         public SuccessStoreGameSelection(Game game)
         {
             this.game = game;
 
             InitializeComponent();
+
+            bool first = true;
+            searchProviders = SuccessStoryDatabase.AchievementManualSearchProviders;
+            searchProviderButtons = new List<AchievementProviderRadioButton>();
+            foreach (var searchProvider in searchProviders)
+            {
+                //searchProvider.Value
+                AchievementProviderRadioButton achBtn = new AchievementProviderRadioButton();
+                achBtn.IsChecked = first;
+                achBtn.Text = searchProvider.Value.ClientName;
+                achBtn.Glyph = searchProvider.Value.Glyph;
+                achBtn.Tag = searchProvider.Value;
+                PART_ManualList.Children.Add(achBtn);
+                searchProviderButtons.Add(achBtn);
+                first = false;
+            }
 
             PART_DataLoadWishlist.Visibility = Visibility.Collapsed;
             PART_GridData.IsEnabled = true;
@@ -73,16 +93,10 @@ namespace SuccessStory.Views
         {
             SearchResult searchResult = (SearchResult)lbSelectable.SelectedItem;
 
-            if ((bool)rbSteam.IsChecked)
+            ISearchableManualAchievements searchProvider = GetSelectedHandler();
+            if (searchProvider != null)
             {
-                steamAchievements.SetLocal();
-                steamAchievements.SetManual();
-                gameAchievements = steamAchievements.GetAchievements(game, searchResult.AppId);
-            }
-
-            if ((bool)rbExophase.IsChecked)
-            {
-                gameAchievements = exophaseAchievements.GetAchievements(game, searchResult);
+                gameAchievements = searchProvider.GetManualAchievements(game, searchResult);
             }
 
             ((Window)this.Parent).Close();
@@ -115,9 +129,6 @@ namespace SuccessStory.Views
 
         private void SearchElements()
         {
-            bool IsSteam = (rbSteam != null) ? (bool)rbSteam.IsChecked : false; ;
-            bool IsExophase = (rbExophase != null) ? (bool)rbExophase.IsChecked : false;
-
             if (SearchElement == null || SearchElement.Text.IsNullOrEmpty())
             {
                 return;
@@ -129,7 +140,7 @@ namespace SuccessStory.Views
             string gameSearch = RemoveAccents(SearchElement.Text);
 
             lbSelectable.ItemsSource = null;
-            Task task = Task.Run(() => LoadData(gameSearch, IsSteam, IsExophase))
+            Task task = Task.Run(() => LoadData(gameSearch))
                 .ContinueWith(antecedent =>
                 {
                     this.Dispatcher.Invoke(new Action(() => {
@@ -157,20 +168,16 @@ namespace SuccessStory.Views
             return sbReturn.ToString();
         }
 
-        private async Task<List<SearchResult>> LoadData(string SearchElement, bool IsSteam, bool IsExophase)
+        private async Task<List<SearchResult>> LoadData(string SearchElement)
         {
-            var results = new List<SearchResult>();
+            List<SearchResult> results = null;
 
             try
             {
-                if (IsSteam)
+                ISearchableManualAchievements searchProvider = GetSelectedHandler();
+                if (searchProvider != null)
                 {
-                    results = steamAchievements.SearchGame(SearchElement);
-                }
-
-                if (IsExophase)
-                {
-                    results = exophaseAchievements.SearchGame(SearchElement);
+                    results = searchProvider.SearchGame(SearchElement);
                 }
             }
             catch (Exception ex)
@@ -178,7 +185,26 @@ namespace SuccessStory.Views
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
 
-            return results;
+            return results ?? new List<SearchResult>();
+        }
+        private ISearchableManualAchievements GetSelectedHandler()
+        {
+            foreach (var searchProviderButton in searchProviderButtons)
+            {
+                ISearchableManualAchievements searchProvider = searchProviderButton.Dispatcher.Invoke(new Func<ISearchableManualAchievements>(() =>
+                    {
+                        if (searchProviderButton.IsChecked ?? false)
+                        {
+                            return searchProviderButton.Tag as ISearchableManualAchievements;
+                        }
+                        return null;
+                    }));
+                if (searchProvider != null)
+                {
+                    return searchProvider;
+                }
+            }
+            return null;
         }
 
 

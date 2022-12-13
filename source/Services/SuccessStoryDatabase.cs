@@ -32,47 +32,61 @@ namespace SuccessStory.Services
         private bool _isRetroachievements { get; set; }
 
         private static Dictionary<AchievementSource, GenericAchievements> _achievementProviders { get; set; }
+        private static Dictionary<AchievementSource, ISearchableManualAchievements> _achievementManualSearchProviders { get; set; }
         private static object _achievementProvidersLock => new object();
         internal static Dictionary<AchievementSource, GenericAchievements> AchievementProviders
         {
             get
             {
-                lock (_achievementProvidersLock)
+                PrepareAchievmentProviders();
+                return _achievementProviders;
+            }
+        }
+        internal static Dictionary<AchievementSource, ISearchableManualAchievements> AchievementManualSearchProviders
+        {
+            get
+            {
+                PrepareAchievmentProviders();
+                return _achievementManualSearchProviders;
+            }
+        }
+        private static void PrepareAchievmentProviders()
+        {
+            lock (_achievementProvidersLock)
+            {
+                if (_achievementProviders == null)
                 {
-                    if (_achievementProviders == null)
+                    _achievementProviders = new Dictionary<AchievementSource, GenericAchievements>();
+                    _achievementManualSearchProviders = new Dictionary<AchievementSource, ISearchableManualAchievements>();
+
+                    // for now just scan ourself, we might be able to dynamicly load from other plugins but we'd need to remove all tight coupling first
+                    foreach (Type item in typeof(IAchievementFactory).GetTypeInfo().Assembly.GetTypes())
                     {
-                        _achievementProviders = new Dictionary<AchievementSource, GenericAchievements>();
-
-                        // for now just scan ourself, we might be able to dynamicly load from other plugins but we'd need to remove all tight coupling first
-                        foreach (Type item in typeof(IAchievementFactory).GetTypeInfo().Assembly.GetTypes())
+                        if (item.GetInterfaces().Contains(typeof(IAchievementFactory)))
                         {
-                            if (item.GetInterfaces().Contains(typeof(IAchievementFactory)))
+                            ConstructorInfo[] cons = item.GetConstructors();
+                            foreach (ConstructorInfo con in cons)
                             {
-                                ConstructorInfo[] cons = item.GetConstructors();
-                                foreach (ConstructorInfo con in cons)
+                                try
                                 {
-                                    try
+                                    /*ParameterInfo[] @params = con.GetParameters();
+                                    object[] paramList = new object[@params.Length];
+                                    for (int i = 0; i < @params.Length; i++)
                                     {
-                                        /*ParameterInfo[] @params = con.GetParameters();
-                                        object[] paramList = new object[@params.Length];
-                                        for (int i = 0; i < @params.Length; i++)
-                                        {
-                                            paramList[i] = ServiceProvider.GetService(@params[i].ParameterType);
-                                        }
-
-                                        IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item, paramList);
-                                        */
-                                        IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item);
-                                        plugin.BuildClient(_achievementProviders);
+                                        paramList[i] = ServiceProvider.GetService(@params[i].ParameterType);
                                     }
-                                    catch { }
+
+                                    IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item, paramList);
+                                    */
+                                    IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item);
+                                    plugin.BuildClient(_achievementProviders, _achievementManualSearchProviders);
                                 }
+                                catch { }
                             }
                         }
-
                     }
+
                 }
-                return _achievementProviders;
             }
         }
 
@@ -152,25 +166,13 @@ namespace SuccessStory.Services
                 gameAchievements = Get(game, true);
                 if (gameAchievements != null && gameAchievements.HasData)
                 {
-                    if (gameAchievements.SourcesLink?.Name.IsEqual("steam") ?? false)
+                    foreach (var achievementManualSearchProvider in AchievementManualSearchProviders)
                     {
-                        string str = gameAchievements.SourcesLink?.Url.Replace("https://steamcommunity.com/stats/", string.Empty).Replace("/achievements", string.Empty);
-                        int.TryParse(str, out int AppId);
-
-                        SteamAchievements steamAchievements = new SteamAchievements();
-                        steamAchievements.SetLocal();
-                        steamAchievements.SetManual();
-                        gameAchievements = steamAchievements.GetAchievements(game, AppId);
-                    }
-                    else if (gameAchievements.SourcesLink?.Name.IsEqual("exophase") ?? false)
-                    {
-                        SearchResult searchResult = new SearchResult
+                        if (achievementManualSearchProvider.Value.CanDoManualAchievements(game, gameAchievements))
                         {
-                            Url = gameAchievements.SourcesLink?.Url
-                        };
-
-                        ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                        gameAchievements = exophaseAchievements.GetAchievements(game, searchResult);
+                            gameAchievements = achievementManualSearchProvider.Value.DoManualAchievements(game, gameAchievements);
+                            break;
+                        }
                     }
 
                     Common.LogDebug(true, $"RefreshManual({game.Id.ToString()}) - gameAchievements: {Serialization.ToJson(gameAchievements)}");

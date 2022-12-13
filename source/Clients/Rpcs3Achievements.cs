@@ -15,7 +15,7 @@ namespace SuccessStory.Clients
 {
     class Rpcs3AchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.RPCS3] = new Rpcs3Achievements();
         }

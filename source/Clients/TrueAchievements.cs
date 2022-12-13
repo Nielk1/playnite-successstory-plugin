@@ -17,7 +17,7 @@ namespace SuccessStory.Clients
 {
     class TrueAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.TEMP_TRUE] = new TrueAchievements();
         }

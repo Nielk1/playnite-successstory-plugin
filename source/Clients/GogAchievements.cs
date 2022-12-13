@@ -14,7 +14,7 @@ namespace SuccessStory.Clients
 {
     class GogAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.GOG] = new GogAchievements();
         }

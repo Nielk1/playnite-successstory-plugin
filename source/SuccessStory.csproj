@@ -133,6 +133,9 @@
     <Compile Include="Clients\GenericAchievements.cs" />
     <Compile Include="Clients\GenshinImpactAchievements.cs" />
     <Compile Include="Clients\GuildWars2Achievements.cs" />
+    <Compile Include="Controls\AchievmentProviderRadioButton.xaml.cs">
+      <DependentUpon>AchievmentProviderRadioButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\GenshinImpactAchievementsCategory.cs" />
     <Compile Include="Clients\GogAchievements.cs" />
     <Compile Include="Clients\OriginAchievements.cs" />
@@ -379,6 +382,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Include="Controls\AchievmentProviderRadioButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\Customs\AchievementImage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

@@ -30,14 +30,19 @@ namespace SuccessStory.Clients
 {
     class SteamAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.Steam] = new SteamAchievements();
-            Providers[AchievementSource.Local] = SteamAchievements.GetLocalSteamAchievementsProvider();
+
+            SteamAchievements tmp = SteamAchievements.GetLocalSteamAchievementsProvider();
+            Providers[AchievementSource.Local] = tmp;
+            ManualSearchProviders[AchievementSource.Local] = tmp;
         }
     }
     class SteamAchievements : GenericAchievements, ISearchableManualAchievements
     {
+        public string Glyph => "\uE906";
+
         public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.SteamLibrary && settings.EnableSteam)
@@ -68,7 +73,7 @@ namespace SuccessStory.Clients
         private IHtmlDocument HtmlDocument { get; set; } = null;
 
         private bool IsLocal { get; set; } = false;
-        private bool IsManual { get; set; } = false;
+        //private bool IsManual { get; set; } = false;
  
         private static string SteamId { get; set; } = string.Empty;
         private static string SteamApiKey { get; set; } = string.Empty;
@@ -105,6 +110,7 @@ namespace SuccessStory.Clients
                 return gameAchievements;
             }
 
+            bool IsManual = false;
 
             logger.Info($"GetAchievements() - IsLocal : {IsLocal}, IsManual : {IsManual}, EnableSteamWithoutWebApi: {PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi}, SteamIsPrivate: {PluginDatabase.PluginSettings.Settings.SteamIsPrivate}");
             if (!IsLocal)
@@ -259,17 +265,27 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <remarks>
-        /// Used only for manual scan, so we can just use this here
-        /// </remarks>
-        /// <param name="game"></param>
-        /// <param name="AppId"></param>
-        /// <returns></returns>
-        public GameAchievements GetAchievements(Game game, int AppId)
+        public bool CanDoManualAchievements(Game game, GameAchievements gameAchievements)
         {
+            return gameAchievements.SourcesLink?.Name.IsEqual("steam") ?? false;
+        }
+        public GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements)
+        {
+            string str = gameAchievements.SourcesLink?.Url.Replace("https://steamcommunity.com/stats/", string.Empty).Replace("/achievements", string.Empty);
+            int.TryParse(str, out int AppId);
+            SearchResult searchResult = new SearchResult
+            {
+                AppId = AppId
+            };
+            return GetManualAchievementsInternal(game, AppId);
+        }
+        public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
+        {
+            return GetManualAchievementsInternal(game, searchResult.AppId);
+        }
+        private GameAchievements GetManualAchievementsInternal(Game game, int AppId)
+        {
+
             GameAchievements gameAchievements = SuccessStory.PluginDatabase.GetDefault(game);
             List<Achievements> AllAchievements = new List<Achievements>();
 
@@ -280,6 +296,7 @@ namespace SuccessStory.Clients
                 return gameAchievements;
             }
 
+            bool IsManual = true;
 
             logger.Info($"GetAchievements({AppId}) - IsLocal : {IsLocal}, IsManual : {IsManual}, EnableSteamWithoutWebApi: {PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi}, SteamIsPrivate: {PluginDatabase.PluginSettings.Settings.SteamIsPrivate}");
             if (IsLocal)
@@ -508,10 +525,10 @@ namespace SuccessStory.Clients
             IsLocal = true;
         }
 
-        public void SetManual()
-        {
-            IsManual = true;
-        }
+        //public void SetManual()
+        //{
+        //    IsManual = true;
+        //}
 
 
         #region Steam

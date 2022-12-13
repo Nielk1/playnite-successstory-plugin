@@ -17,7 +17,7 @@ namespace SuccessStory.Clients
 {
     class GenshinImpactAchivementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.GenshinImpact] = new GenshinImpactAchievements();
         }

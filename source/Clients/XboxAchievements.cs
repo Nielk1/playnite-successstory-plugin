@@ -21,7 +21,7 @@ namespace SuccessStory.Clients
 {
     class XboxAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.Xbox] = new XboxAchievements();
         }

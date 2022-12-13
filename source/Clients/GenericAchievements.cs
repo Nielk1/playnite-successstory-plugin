@@ -19,11 +19,16 @@ namespace SuccessStory.Clients
 {
     interface IAchievementFactory
     {
-        void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers);
+        void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders);
     }
     interface ISearchableManualAchievements
     {
+        string ClientName { get; }
+        string Glyph { get; }
         List<SearchResult> SearchGame(string Name);
+        bool CanDoManualAchievements(Game game, GameAchievements gameAchievements);
+        GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements);
+        GameAchievements GetManualAchievements(Game game, SearchResult searchResult);
     }
     abstract class GenericAchievements
     {
@@ -92,7 +97,7 @@ namespace SuccessStory.Clients
         protected bool? CachedConfigurationValidationResult { get; set; }
         protected bool? CachedIsConnectedResult { get; set; }
 
-        protected string ClientName { get; }
+        public string ClientName { get; }
         protected string LocalLang { get; }
         protected string LocalLangShort { get; }
 

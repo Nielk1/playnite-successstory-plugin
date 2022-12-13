@@ -21,7 +21,7 @@ namespace SuccessStory.Clients
 {
     class OverwatchAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.Overwatch] = new OverwatchAchievements();
         }

@@ -34,13 +34,18 @@ namespace SuccessStory.Clients
 
     class ExophaseAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
-            Providers[AchievementSource.TEMP_EXOPHASE] = new ExophaseAchievements();
+            ExophaseAchievements tmp = new ExophaseAchievements();
+            Providers[AchievementSource.TEMP_EXOPHASE] = tmp;
+            ManualSearchProviders[AchievementSource.TEMP_EXOPHASE] = tmp;
         }
     }
     class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements
     {
+        public string Glyph => "\uEA56";
+
+
         private const string UrlExophaseSearch = @"https://api.exophase.com/public/archive/games?q={0}&sort=added";
         private const string UrlExophase = @"https://www.exophase.com";
         private readonly string UrlExophaseLogin = $"{UrlExophase}/login";
@@ -63,10 +68,27 @@ namespace SuccessStory.Clients
 
         public GameAchievements GetAchievements(Game game, string url)
         {
-            return GetAchievements(game, new SearchResult { Name = game.Name, Url = url });
+            return GetManualAchievementsInternal(game, new SearchResult { Name = game.Name, Url = url });
         }
 
-        public GameAchievements GetAchievements(Game game, SearchResult searchResult, bool IsRetry = false)
+
+        public bool CanDoManualAchievements(Game game, GameAchievements gameAchievements)
+        {
+            return gameAchievements.SourcesLink?.Name.IsEqual("exophase") ?? false;
+        }
+        public GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements)
+        {
+            SearchResult searchResult = new SearchResult
+            {
+                Url = gameAchievements.SourcesLink?.Url
+            };
+            return GetManualAchievementsInternal(game, searchResult, false);
+        }
+        public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
+        {
+            return GetManualAchievementsInternal(game, searchResult, false);
+        }
+        private GameAchievements GetManualAchievementsInternal(Game game, SearchResult searchResult, bool IsRetry = false)
         {
             GameAchievements gameAchievements = SuccessStory.PluginDatabase.GetDefault(game);
             List<Achievements> AllAchievements = new List<Achievements>();
@@ -86,7 +108,7 @@ namespace SuccessStory.Clients
                     logger.Warn($"Problem with {searchResult.Url}");
                     if (!IsRetry)
                     {
-                        return GetAchievements(game, searchResult, true);
+                        return GetManualAchievementsInternal(game, searchResult, true);
                     }
                 }
                 else

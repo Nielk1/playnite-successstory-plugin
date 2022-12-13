@@ -18,7 +18,7 @@ namespace SuccessStory.Clients
 {
     class Starcraft2AchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
         {
             Providers[AchievementSource.Starcraft2] = new Starcraft2Achievements();
         }
