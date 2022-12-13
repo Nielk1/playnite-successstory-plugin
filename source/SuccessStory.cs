@@ -43,6 +43,10 @@ namespace SuccessStory
         public static bool TaskIsPaused { get; set; } = false;
         private CancellationTokenSource tokenSource => new CancellationTokenSource();
 
+
+        /// <summary>
+        /// Static state variable, remove if possible
+        /// </summary>
         public static bool IsFromMenu { get; set; } = false;
 
 
@@ -135,6 +139,7 @@ namespace SuccessStory
 
 
         #region Custom event
+        // TODO: fix tight coupling here
         public void OnCustomThemeButtonClick(object sender, RoutedEventArgs e)
         {
             try
@@ -747,6 +752,7 @@ namespace SuccessStory
 
 
         #region Game event
+        // TODO: this function always uses steam manually to get achivement rates
         public override void OnGameSelected(OnGameSelectedEventArgs args)
         {
             // TODO Sourcelink - Removed for Playnite 11

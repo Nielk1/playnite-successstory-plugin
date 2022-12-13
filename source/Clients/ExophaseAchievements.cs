@@ -39,7 +39,7 @@ namespace SuccessStory.Clients
             Providers[AchievementSource.TEMP_EXOPHASE] = new ExophaseAchievements();
         }
     }
-    class ExophaseAchievements : GenericAchievements
+    class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements
     {
         private const string UrlExophaseSearch = @"https://api.exophase.com/public/archive/games?q={0}&sort=added";
         private const string UrlExophase = @"https://www.exophase.com";

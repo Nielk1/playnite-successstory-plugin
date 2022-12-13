@@ -59,7 +59,7 @@ namespace SuccessStory.Clients
                             Action = (mainMenuItem) =>
                             {
                                 PluginDatabase.Remove(gameMenu);
-                                PluginDatabase.GetGenshinImpact(gameMenu);
+                                GetGenshinImpact(gameMenu);
                             }
                         });
                     }
@@ -95,7 +95,7 @@ namespace SuccessStory.Clients
             }
             return false;
         }
-        public GameAchievements RefreshManualOverrideData(Game game)
+        public override GameAchievements RefreshManualOverrideData(Game game)
         {
             logger.Info($"RefreshGenshinImpact({game?.Name} - {game?.Id})");
             GameAchievements gameAchievements = null;
@@ -114,6 +114,19 @@ namespace SuccessStory.Clients
         }
 
 
+        public void GetGenshinImpact(Game game)
+        {
+            try
+            {
+                GenshinImpactAchievements genshinImpactAchievements = new GenshinImpactAchievements();
+                GameAchievements gameAchievements = genshinImpactAchievements.GetAchievements(game);
+                PluginDatabase.AddOrUpdate(gameAchievements);
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+            }
+        }
 
 
 

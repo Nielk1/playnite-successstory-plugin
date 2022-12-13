@@ -141,6 +141,7 @@ namespace SuccessStory.Services
             }
         }
 
+        // TODO: tight coupling of manual refresh
         public GameAchievements RefreshManual(Game game)
         {
             logger.Info($"RefreshManual({game?.Name} - {game?.Id})");
@@ -174,39 +175,6 @@ namespace SuccessStory.Services
 
                     Common.LogDebug(true, $"RefreshManual({game.Id.ToString()}) - gameAchievements: {Serialization.ToJson(gameAchievements)}");
                 }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginName);
-            }
-
-            return gameAchievements;
-        }
-
-
-        public void GetGenshinImpact(Game game)
-        {
-            try
-            {
-                GenshinImpactAchievements genshinImpactAchievements = new GenshinImpactAchievements();
-                GameAchievements gameAchievements = genshinImpactAchievements.GetAchievements(game);
-                AddOrUpdate(gameAchievements);
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, true, PluginName);
-            }
-        }
-
-        public GameAchievements RefreshGenshinImpact(Game game)
-        {
-            logger.Info($"RefreshGenshinImpact({game?.Name} - {game?.Id})");
-            GameAchievements gameAchievements = null;
-
-            try
-            {
-                GenshinImpactAchievements genshinImpactAchievements = new GenshinImpactAchievements();
-                gameAchievements = genshinImpactAchievements.GetAchievements(game);
             }
             catch (Exception ex)
             {
@@ -448,6 +416,7 @@ namespace SuccessStory.Services
             return new AchievementsGraphicsDataCount { Labels = GraphicsAchievementsLabels, Series = SourceAchievementsSeries };
         }
 
+        // TODO: more tight coupling here
         public AchievementsGraphicsDataCountSources GetCountBySources()
         {
             List<string> tempSourcesLabels = new List<string>();
@@ -1092,7 +1061,7 @@ namespace SuccessStory.Services
             }
         }
 
-
+        // TODO: tight coupling here between steam and exophase, purpose of this code yet unknown
         public void RefreshRarety()
         {
             GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(

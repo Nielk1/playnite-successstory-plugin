@@ -26,6 +26,8 @@ namespace SuccessStory.Views
 {
     /// <summary>
     /// Logique d'interaction pour SuccessStoreGameSelection.xaml
+    /// Interaction logic for SuccessStoreGameSelection.xaml
+    /// Used only for manual achievements gatherer
     /// </summary>
     public partial class SuccessStoreGameSelection : UserControl
     {

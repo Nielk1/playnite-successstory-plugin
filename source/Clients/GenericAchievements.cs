@@ -21,6 +21,10 @@ namespace SuccessStory.Clients
     {
         void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers);
     }
+    interface ISearchableManualAchievements
+    {
+        List<SearchResult> SearchGame(string Name);
+    }
     abstract class GenericAchievements
     {
         internal AchievementSource TemporarySource { get; set; }
@@ -116,7 +120,7 @@ namespace SuccessStory.Clients
         /// </summary>
         /// <param name="Id"></param>
         /// <returns></returns>
-        public GameAchievements GetAchievements(Guid Id)
+        /*public GameAchievements GetAchievements(Guid Id)
         {
             Game game = PluginDatabase.PlayniteApi.Database.Games.Get(Id);
             if (game == null)
@@ -125,7 +129,7 @@ namespace SuccessStory.Clients
             }
 
             return GetAchievements(game);
-        }
+        }*/
 
         /// <summary>
         /// Get all achievements for a game.

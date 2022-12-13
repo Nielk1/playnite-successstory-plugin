@@ -36,7 +36,7 @@ namespace SuccessStory.Clients
             Providers[AchievementSource.Local] = SteamAchievements.GetLocalSteamAchievementsProvider();
         }
     }
-    class SteamAchievements : GenericAchievements
+    class SteamAchievements : GenericAchievements, ISearchableManualAchievements
     {
         public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
@@ -259,6 +259,15 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <remarks>
+        /// Used only for manual scan, so we can just use this here
+        /// </remarks>
+        /// <param name="game"></param>
+        /// <param name="AppId"></param>
+        /// <returns></returns>
         public GameAchievements GetAchievements(Game game, int AppId)
         {
             GameAchievements gameAchievements = SuccessStory.PluginDatabase.GetDefault(game);
@@ -1100,7 +1109,17 @@ namespace SuccessStory.Clients
             return string.Empty;
         }
 
-
+        /// <summary>
+        /// Get achievement earn percentage by other users.
+        /// </summary>
+        /// <remarks>
+        /// If using SteamWithoutWebApi do nothing.
+        /// If no SteamAPIKey, do nothing.
+        /// Use SteamWebApi's ISteamUserStats to gather percentages.
+        /// </remarks>
+        /// <param name="AppId"></param>
+        /// <param name="AllAchievements"></param>
+        /// <returns></returns>
         public List<Achievements> GetGlobalAchievementPercentagesForApp(int AppId, List<Achievements> AllAchievements)
         {
             if (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi)
@@ -1145,6 +1164,14 @@ namespace SuccessStory.Clients
             return AllAchievements;
         }
 
+        /// <summary>
+        /// Get achievement earn percentage by other users.
+        /// </summary>
+        /// <remarks>
+        /// Uses public HTML achivement page.
+        /// <param name="AppId"></param>
+        /// <param name="AllAchievements"></param>
+        /// <returns></returns>
         private List<Achievements> GetGlobalAchievementPercentagesForAppByWeb(int AppId, List<Achievements> AllAchievements)
         {
             string url = string.Empty;
