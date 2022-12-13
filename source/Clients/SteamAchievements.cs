@@ -16,7 +16,6 @@ using SteamKit2;
 using System.Globalization;
 using CommonPlayniteShared.Common.Web;
 using System.Text.RegularExpressions;
-using CommonPluginsStores;
 using CommonPluginsShared.Models;
 using PlayniteTools = CommonPluginsShared.PlayniteTools;
 using CommonPluginsShared.Extensions;
@@ -41,20 +40,6 @@ namespace SuccessStory.Clients
     }
     class SteamAchievements : GenericAchievements, ISearchableManualAchievements
     {
-        public string Glyph => "\uE906";
-
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
-        {
-            if (pluginType == ExternalPlugin.SteamLibrary && settings.EnableSteam)
-            {
-                return AchievementSource.Steam;
-            }
-            return AchievementSource.None;
-        }
-
-
-
-
         protected static SteamApi _steamApi;
         internal static SteamApi steamApi
         {
@@ -92,6 +77,116 @@ namespace SuccessStory.Clients
         {
             TemporarySource = AchievementSource.Steam;
         }
+
+
+        #region Searchable Manual Achievements
+        public string Glyph => "\uE906";
+        public List<SearchResult> SearchGame(string Name)
+        {
+            List<SearchResult> ListSearchGames = new List<SearchResult>();
+
+            string Url = string.Empty;
+            try
+            {
+                Url = string.Format(UrlSearch, WebUtility.UrlEncode(Name));
+                string DataSteamSearch = Web.DownloadStringData(Url).GetAwaiter().GetResult();
+                IHtmlDocument htmlDocument = new HtmlParser().Parse(DataSteamSearch);
+
+                int index = 0;
+                foreach (var gameElem in htmlDocument.QuerySelectorAll(".search_result_row"))
+                {
+                    if (index == 10)
+                    {
+                        break;
+                    }
+
+                    var url = gameElem.GetAttribute("href");
+                    var title = gameElem.QuerySelector(".title").InnerHtml;
+                    var img = gameElem.QuerySelector(".search_capsule img").GetAttribute("src");
+                    var releaseDate = gameElem.QuerySelector(".search_released").InnerHtml;
+                    if (gameElem.HasAttribute("data-ds-packageid"))
+                    {
+                        continue;
+                    }
+
+                    int.TryParse(gameElem.GetAttribute("data-ds-appid"), out int gameId);
+
+                    int AchievementsCount = 0;
+                    if (!PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi & IsConfigured())
+                    {
+                        if (gameId != 0)
+                        {
+                            using (dynamic steamWebAPI = WebAPI.GetInterface("ISteamUserStats", SteamApiKey))
+                            {
+                                KeyValue SchemaForGame = steamWebAPI.GetSchemaForGame(appid: gameId, l: LocalLang);
+                                AchievementsCount = SchemaForGame.Children?.Find(x => x.Name == "availableGameStats")?.Children?.Find(x => x.Name == "achievements")?.Children?.Count ?? 0;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        DataSteamSearch = Web.DownloadStringData(string.Format(url, WebUtility.UrlEncode(Name))).GetAwaiter().GetResult();
+                        IHtmlDocument htmlDocumentDetails = new HtmlParser().Parse(DataSteamSearch);
+
+                        var AchievementsInfo = htmlDocumentDetails.QuerySelector("#achievement_block .block_title");
+                        if (AchievementsInfo != null)
+                        {
+                            int.TryParse(Regex.Replace(AchievementsInfo.InnerHtml, "[^0-9]", ""), out AchievementsCount);
+                        }
+                    }
+
+                    if (gameId != 0)
+                    {
+                        ListSearchGames.Add(new SearchResult
+                        {
+                            Name = WebUtility.HtmlDecode(title),
+                            Url = url,
+                            UrlImage = img,
+                            AppId = gameId,
+                            AchievementsCount = AchievementsCount
+                        });
+                    }
+
+                    index++;
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, $"Error with SearchGame{Name} on {Url}", true, PluginDatabase.PluginName);
+            }
+
+            return ListSearchGames;
+        }
+        public bool CanDoManualAchievements(Game game, GameAchievements gameAchievements)
+        {
+            return gameAchievements.SourcesLink?.Name.IsEqual("steam") ?? false;
+        }
+        public GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements)
+        {
+            string str = gameAchievements.SourcesLink?.Url.Replace("https://steamcommunity.com/stats/", string.Empty).Replace("/achievements", string.Empty);
+            int.TryParse(str, out int AppId);
+            SearchResult searchResult = new SearchResult
+            {
+                AppId = AppId
+            };
+            return GetManualAchievementsInternal(game, AppId);
+        }
+        public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
+        {
+            return GetManualAchievementsInternal(game, searchResult.AppId);
+        }
+        #endregion
+
+
+        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        {
+            if (pluginType == ExternalPlugin.SteamLibrary && settings.EnableSteam)
+            {
+                return AchievementSource.Steam;
+            }
+            return AchievementSource.None;
+        }
+
 
 
         public override GameAchievements GetAchievements(Game game)
@@ -265,24 +360,7 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
-        public bool CanDoManualAchievements(Game game, GameAchievements gameAchievements)
-        {
-            return gameAchievements.SourcesLink?.Name.IsEqual("steam") ?? false;
-        }
-        public GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements)
-        {
-            string str = gameAchievements.SourcesLink?.Url.Replace("https://steamcommunity.com/stats/", string.Empty).Replace("/achievements", string.Empty);
-            int.TryParse(str, out int AppId);
-            SearchResult searchResult = new SearchResult
-            {
-                AppId = AppId
-            };
-            return GetManualAchievementsInternal(game, AppId);
-        }
-        public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
-        {
-            return GetManualAchievementsInternal(game, searchResult.AppId);
-        }
+
         private GameAchievements GetManualAchievementsInternal(Game game, int AppId)
         {
 
@@ -331,9 +409,7 @@ namespace SuccessStory.Clients
                             });
                         }
 
-
                         gameAchievements.Items = AllAchievements;
-
 
                         // Set source link
                         gameAchievements.SourcesLink = new SourceLink
@@ -386,7 +462,6 @@ namespace SuccessStory.Clients
 
 
         #region Configuration
-        // TODO Rewrite
         public override bool ValidateConfiguration()
         {
             if (PlayniteTools.IsDisabledPlaynitePlugins("SteamLibrary"))
@@ -420,8 +495,6 @@ namespace SuccessStory.Clients
                             CachedConfigurationValidationResult = false;
                         }
                     }
-
-
                     
                     if (CachedConfigurationValidationResult == null)
                     {
@@ -532,82 +605,6 @@ namespace SuccessStory.Clients
 
 
         #region Steam
-        public List<SearchResult> SearchGame(string Name)
-        {
-            List<SearchResult> ListSearchGames = new List<SearchResult>();
-
-            string Url = string.Empty;
-            try
-            {
-                Url = string.Format(UrlSearch, WebUtility.UrlEncode(Name));
-                string DataSteamSearch = Web.DownloadStringData(Url).GetAwaiter().GetResult();
-                IHtmlDocument htmlDocument = new HtmlParser().Parse(DataSteamSearch);
-
-                int index = 0;
-                foreach (var gameElem in htmlDocument.QuerySelectorAll(".search_result_row"))
-                {
-                    if (index == 10)
-                    {
-                        break;
-                    }
-
-                    var url = gameElem.GetAttribute("href");
-                    var title = gameElem.QuerySelector(".title").InnerHtml;
-                    var img = gameElem.QuerySelector(".search_capsule img").GetAttribute("src");
-                    var releaseDate = gameElem.QuerySelector(".search_released").InnerHtml;
-                    if (gameElem.HasAttribute("data-ds-packageid"))
-                    {
-                        continue;
-                    }
-
-                    int.TryParse(gameElem.GetAttribute("data-ds-appid"), out int gameId);
-
-                    int AchievementsCount = 0;
-                    if (!PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi & IsConfigured())
-                    {
-                        if (gameId != 0)
-                        {
-                            using (dynamic steamWebAPI = WebAPI.GetInterface("ISteamUserStats", SteamApiKey))
-                            {
-                                KeyValue SchemaForGame = steamWebAPI.GetSchemaForGame(appid: gameId, l: LocalLang);
-                                AchievementsCount = SchemaForGame.Children?.Find(x => x.Name == "availableGameStats")?.Children?.Find(x => x.Name == "achievements")?.Children?.Count ?? 0;
-                            }
-                        }
-                    }
-                    else
-                    {
-                        DataSteamSearch = Web.DownloadStringData(string.Format(url, WebUtility.UrlEncode(Name))).GetAwaiter().GetResult();
-                        IHtmlDocument htmlDocumentDetails = new HtmlParser().Parse(DataSteamSearch);
-
-                        var AchievementsInfo = htmlDocumentDetails.QuerySelector("#achievement_block .block_title");
-                        if (AchievementsInfo != null)
-                        {
-                            int.TryParse(Regex.Replace(AchievementsInfo.InnerHtml, "[^0-9]", ""), out AchievementsCount);
-                        }
-                    }
-
-                    if (gameId != 0)
-                    {
-                        ListSearchGames.Add(new SearchResult
-                        {
-                            Name = WebUtility.HtmlDecode(title),
-                            Url = url,
-                            UrlImage = img,
-                            AppId = gameId,
-                            AchievementsCount = AchievementsCount
-                        });
-                    }
-
-                    index++;
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, $"Error with SearchGame{Name} on {Url}", true, PluginDatabase.PluginName);
-            }
-
-            return ListSearchGames;
-        }
 
 
         private void SteamUserAndSteamIdByWeb()

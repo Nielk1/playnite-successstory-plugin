@@ -54,12 +54,6 @@ namespace SuccessStory.Clients
             return null;
         }
 
-
-
-
-
-
-
         private const string UrlOverwatchProfil = @"https://playoverwatch.com";
         private string UrlOverwatchLogin = $"{UrlOverwatchProfil}/login";
         private string UrlOverwatchProfilLocalised = $"{UrlOverwatchProfil}/" + "{0}";
@@ -101,13 +95,11 @@ namespace SuccessStory.Clients
             new ColorElement { Name = "ow-zenyatta-color", Color = "#e1c931" }
         };
 
-
         public OverwatchAchievements() : base("Overwatch", CodeLang.GetEpicLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
             TemporarySource = AchievementSource.Overwatch;
             UrlOverwatchProfilLocalised = string.Format(UrlOverwatchProfilLocalised, LocalLang);
         }
-
 
         public override GameAchievements GetAchievements(Game game)
         {
@@ -220,7 +212,6 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
-
         #region Configuration
         public override bool ValidateConfiguration()
         {
@@ -246,8 +237,7 @@ namespace SuccessStory.Clients
 
             return (bool)CachedConfigurationValidationResult;
         }
-
-
+        
         public override bool IsConnected()
         {
             if (CachedIsConnectedResult == null)
@@ -290,7 +280,6 @@ namespace SuccessStory.Clients
             return PluginDatabase.PluginSettings.Settings.EnableOverwatchAchievements;
         }
         #endregion
-
 
         #region Battle.net - Overwatch
         private List<GameStats> GetUsersStats(IHtmlDocument htmlDocument)
@@ -521,7 +510,6 @@ namespace SuccessStory.Clients
             return AllStats;
         }
         #endregion
-
 
         #region Errors
         public override void ShowNotificationPluginNoAuthenticate(string Message, ExternalPlugin PluginSource)

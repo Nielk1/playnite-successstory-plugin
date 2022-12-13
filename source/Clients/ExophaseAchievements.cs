@@ -43,35 +43,56 @@ namespace SuccessStory.Clients
     }
     class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements
     {
-        public string Glyph => "\uEA56";
-
-
         private const string UrlExophaseSearch = @"https://api.exophase.com/public/archive/games?q={0}&sort=added";
         private const string UrlExophase = @"https://www.exophase.com";
         private readonly string UrlExophaseLogin = $"{UrlExophase}/login";
         private readonly string UrlExophaseLogout = $"{UrlExophase}/logout";
         private readonly string UrlExophaseAccount = $"{UrlExophase}/account";
-
         
-
-
         public ExophaseAchievements() : base("Exophase")
         {
 
         }
 
 
-        public override GameAchievements GetAchievements(Game game)
+        #region Searchable Manual Achievements
+        public string Glyph => "\uEA56";
+        public List<SearchResult> SearchGame(string Name)
         {
-            throw new NotImplementedException();
+            List<SearchResult> ListSearchGames = new List<SearchResult>();
+            try
+            {
+                string UrlSearch = string.Format(UrlExophaseSearch, WebUtility.UrlEncode(Name));
+
+                string StringJsonResult = Web.DownloadStringData(UrlSearch).GetAwaiter().GetResult();
+                if (StringJsonResult == "{\"success\":true,\"games\":false}")
+                {
+                    logger.Warn($"No Exophase result for {Name}");
+                    return ListSearchGames;
+                }
+
+                ExophaseSearchResult exophaseScheachResult = Serialization.FromJson<ExophaseSearchResult>(StringJsonResult);
+
+                var ListExophase = exophaseScheachResult?.games?.list;
+                if (ListExophase != null)
+                {
+                    ListSearchGames = ListExophase.Select(x => new SearchResult
+                    {
+                        Url = x.endpoint_awards,
+                        Name = x.title,
+                        UrlImage = x.images.o,
+                        Platforms = x.platforms.Select(p => p.name).ToList(),
+                        AchievementsCount = x.total_awards
+                    }).ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                Common.LogError(ex, false, $"Error on SearchGame({Name})", true, PluginDatabase.PluginName);
+            }
+
+            return ListSearchGames;
         }
-
-        public GameAchievements GetAchievements(Game game, string url)
-        {
-            return GetManualAchievementsInternal(game, new SearchResult { Name = game.Name, Url = url });
-        }
-
-
         public bool CanDoManualAchievements(Game game, GameAchievements gameAchievements)
         {
             return gameAchievements.SourcesLink?.Name.IsEqual("exophase") ?? false;
@@ -87,6 +108,19 @@ namespace SuccessStory.Clients
         public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
         {
             return GetManualAchievementsInternal(game, searchResult, false);
+        }
+        #endregion
+
+
+        public override GameAchievements GetAchievements(Game game)
+        {
+            throw new NotImplementedException();
+        }
+
+
+        private GameAchievements GetAchievementsInternal(Game game, string url)
+        {
+            return GetManualAchievementsInternal(game, new SearchResult { Name = game.Name, Url = url });
         }
         private GameAchievements GetManualAchievementsInternal(Game game, SearchResult searchResult, bool IsRetry = false)
         {
@@ -178,8 +212,6 @@ namespace SuccessStory.Clients
             // The authentification is only for localised achievement
             return true;
         }
-
-
         public override bool IsConnected()
         {
             if (CachedIsConnectedResult == null)
@@ -189,7 +221,6 @@ namespace SuccessStory.Clients
 
             return (bool)CachedIsConnectedResult;
         }
-
         public override bool EnabledInSettings()
         {
             // No necessary activation
@@ -234,42 +265,6 @@ namespace SuccessStory.Clients
         }
 
 
-        public List<SearchResult> SearchGame(string Name)
-        {
-            List<SearchResult> ListSearchGames = new List<SearchResult>();
-            try
-            {
-                string UrlSearch = string.Format(UrlExophaseSearch, WebUtility.UrlEncode(Name));
-
-                string StringJsonResult = Web.DownloadStringData(UrlSearch).GetAwaiter().GetResult();
-                if (StringJsonResult == "{\"success\":true,\"games\":false}")
-                {
-                    logger.Warn($"No Exophase result for {Name}");
-                    return ListSearchGames;
-                }
-
-                ExophaseSearchResult exophaseScheachResult = Serialization.FromJson<ExophaseSearchResult>(StringJsonResult);
-
-                var ListExophase = exophaseScheachResult?.games?.list;
-                if (ListExophase != null)
-                {
-                    ListSearchGames = ListExophase.Select(x => new SearchResult
-                    {
-                        Url = x.endpoint_awards,
-                        Name = x.title,
-                        UrlImage = x.images.o,
-                        Platforms = x.platforms.Select(p => p.name).ToList(),
-                        AchievementsCount = x.total_awards
-                    }).ToList();
-                }
-            }
-            catch (Exception ex)
-            {
-                Common.LogError(ex, false, $"Error on SearchGame({Name})", true, PluginDatabase.PluginName);
-            }
-
-            return ListSearchGames;
-        }
 
 
         private string GetAchievementsPageUrl(GameAchievements gameAchievements, Services.SuccessStoryDatabase.AchievementSource source)
@@ -330,7 +325,7 @@ namespace SuccessStory.Clients
 
             try
             {
-                GameAchievements exophaseAchievements = GetAchievements(
+                GameAchievements exophaseAchievements = GetAchievementsInternal(
                     PluginDatabase.PlayniteApi.Database.Games.Get(gameAchievements.Id),
                     achievementsUrl
                 );
@@ -373,7 +368,7 @@ namespace SuccessStory.Clients
 
             try
             {
-                GameAchievements exophaseAchievements = GetAchievements(
+                GameAchievements exophaseAchievements = GetAchievementsInternal(
                     PluginDatabase.PlayniteApi.Database.Games.Get(gameAchievements.Id),
                     achievementsUrl
                 );
