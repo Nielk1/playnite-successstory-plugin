@@ -11,6 +11,7 @@ using Playnite.SDK.Models;
 using Playnite.SDK.Plugins;
 using SuccessStory.Models;
 using SuccessStory.Views;
+using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
@@ -24,13 +25,13 @@ namespace SuccessStory.Clients
     }
     class GenshinImpactAchievements : GenericAchievements
     {
-        public override AchievementSource CheckAchivementSourceGameNameOnly(string name, bool ignoreSpecial)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            if (name.IsEqual("Genshin Impact") && !ignoreSpecial)
+            if (game.Name.IsEqual("Genshin Impact") && !ignoreSpecial)
             {
-                return AchievementSource.GenshinImpact;
+                return 200;
             }
-            return AchievementSource.None;
+            return 0;
         }
         public override dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
         {

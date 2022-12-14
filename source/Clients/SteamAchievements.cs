@@ -33,9 +33,24 @@ namespace SuccessStory.Clients
         {
             Providers[AchievementSource.Steam] = new SteamAchievements();
 
-            SteamAchievements tmp = SteamAchievements.GetLocalSteamAchievementsProvider();
+            SteamAchievements tmp = new LocalAchievements();
             Providers[AchievementSource.Local] = tmp;
             ManualSearchProviders[AchievementSource.Local] = tmp;
+        }
+    }
+    class LocalAchievements : SteamAchievements
+    {
+        public LocalAchievements()
+        {
+            SetLocal();
+        }
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        {
+            if (settings.EnableLocal)
+            {
+                return 1;
+            }
+            return 0;
         }
     }
     class SteamAchievements : GenericAchievements, ISearchableManualAchievements
@@ -57,7 +72,7 @@ namespace SuccessStory.Clients
 
         private IHtmlDocument HtmlDocument { get; set; } = null;
 
-        private bool IsLocal { get; set; } = false;
+        protected bool IsLocal { get; set; } = false;
         //private bool IsManual { get; set; } = false;
  
         private static string SteamId { get; set; } = string.Empty;
@@ -178,13 +193,13 @@ namespace SuccessStory.Clients
         #endregion
 
 
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.SteamLibrary && settings.EnableSteam)
             {
-                return AchievementSource.Steam;
+                return 100;
             }
-            return AchievementSource.None;
+            return 0;
         }
 
 
@@ -1520,14 +1535,6 @@ namespace SuccessStory.Clients
             return Achievements;
         }
 
-
-        public static SteamAchievements GetLocalSteamAchievementsProvider()
-        {
-            var provider = new SteamAchievements();
-            provider.SetLocal();
-            provider.TemporarySource = AchievementSource.Steam;
-            return provider;
-        }
         #endregion
 
 

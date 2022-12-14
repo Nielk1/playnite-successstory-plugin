@@ -30,20 +30,13 @@ namespace SuccessStory.Clients
         GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements);
         GameAchievements GetManualAchievements(Game game, SearchResult searchResult);
     }
-    abstract class GenericAchievements
+
+    public abstract class GenericAchievements
     {
         internal AchievementSource TemporarySource { get; set; }
-        public virtual AchievementSource CheckAchivementSourceGameNameOnly(string name, bool ignoreSpecial)
+        public virtual int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            return AchievementSource.None;
-        }
-        public virtual AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
-        {
-            return AchievementSource.None;
-        }
-        public virtual AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
-        {
-            return AchievementSource.None;
+            return 0;
         }
         public virtual bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
         {
@@ -74,23 +67,7 @@ namespace SuccessStory.Clients
         internal static ILogger logger => LogManager.GetLogger();
         internal static IResourceProvider resources => new ResourceProvider();
 
-        protected static IWebView _WebViewOffscreen;
-        internal static IWebView WebViewOffscreen
-        {
-            get
-            {
-                if (_WebViewOffscreen == null)
-                {
-                    _WebViewOffscreen = PluginDatabase.PlayniteApi.WebViews.CreateOffscreenView();
-                }
-                return _WebViewOffscreen;
-            }
 
-            set
-            {
-                _WebViewOffscreen = value;
-            }
-        }
 
         internal static SuccessStoryDatabase PluginDatabase => SuccessStory.PluginDatabase;
 
@@ -300,6 +277,11 @@ namespace SuccessStory.Clients
                     NotificationType.Error
                 ));
             }
+        }
+
+        internal int GetRankOfThisSource(ExternalPlugin externalPlugin, SuccessStorySettings settings, Game game)
+        {
+            return 0;
         }
         #endregion
     }

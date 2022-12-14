@@ -25,7 +25,7 @@ namespace SuccessStory.Clients
     }
     internal class Starcraft2Achievements : BattleNetAchievements
     {
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.BattleNetLibrary)
             {
@@ -35,13 +35,13 @@ namespace SuccessStory.Clients
                     case "starcraft ii":
                         if (settings.EnableSc2Achievements)
                         {
-                            return AchievementSource.Starcraft2;
+                            return 100;
                         }
                         break;
                 }
             }
 
-            return AchievementSource.None;
+            return 0;
         }
 
 

@@ -28,7 +28,7 @@ namespace SuccessStory.Clients
     }
     internal class OverwatchAchievements : BattleNetAchievements
     {
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.BattleNetLibrary)
             {
@@ -37,13 +37,13 @@ namespace SuccessStory.Clients
                     case "overwatch":
                         if (settings.EnableOverwatchAchievements)
                         {
-                            return AchievementSource.Overwatch;
+                            return 200;
                         }
                         break;
                 }
             }
 
-            return AchievementSource.None;
+            return 0;
         }
         public override dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
         {

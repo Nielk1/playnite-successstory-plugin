@@ -28,28 +28,28 @@ namespace SuccessStory.Clients
     }
     class XboxAchievements : GenericAchievements
     {
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.None)
             {
                 if (game.Source?.Name?.Contains("Xbox Game Pass", StringComparison.OrdinalIgnoreCase) ?? false)
                 {
-                    return AchievementSource.Xbox;
+                    return 100;
                 }
                 if (game.Source?.Name?.Contains("Microsoft Store", StringComparison.OrdinalIgnoreCase) ?? false)
                 {
-                    return AchievementSource.Xbox;
+                    return 100;
                 }
 
-                return AchievementSource.None;
+                return 0;
             }
 
             if (pluginType == ExternalPlugin.XboxLibrary && settings.EnableXbox)
             {
-                return AchievementSource.Xbox;
+                return 100;
             }
 
-            return AchievementSource.None;
+            return 0;
         }
 
 

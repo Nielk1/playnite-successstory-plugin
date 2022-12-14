@@ -211,6 +211,7 @@ namespace SuccessStory.Services
             return gameAchievements;
         }
 
+        // TODO: remove tight coupling here
         /// <summary>
         /// Generate database achivements for the game if achievement exist and game not exist in database.
         /// </summary>
@@ -219,14 +220,13 @@ namespace SuccessStory.Services
         {
             Game game = PlayniteApi.Database.Games.Get(Id);
             GameAchievements gameAchievements = GetDefault(game);
-            AchievementSource achievementSource = GetAchievementSource(PluginSettings.Settings, game, true);
+            GenericAchievements achievementProvider = GetAchievementSource(PluginSettings.Settings, game, true);
 
-            if (AchievementProviders.ContainsKey(achievementSource))
+            if (achievementProvider != null)
             {
                 // Generate database only this source
                 if (VerifToAddOrShow(Plugin, PlayniteApi, PluginSettings.Settings, game))
                 {
-                    GenericAchievements achievementProvider = AchievementProviders[achievementSource];
                     RetroAchievements retroAchievementsProvider = achievementProvider as RetroAchievements;
                     PSNAchievements psnAchievementsProvider = achievementProvider as PSNAchievements;
 
@@ -263,16 +263,16 @@ namespace SuccessStory.Services
                         gameAchievements.RAgameID = retroAchievementsProvider.GameId;
                     }
 
-                    Common.LogDebug(true, $"Achievements for {game.Name} - {achievementSource} - {Serialization.ToJson(gameAchievements)}");
+                    Common.LogDebug(true, $"Achievements for {game.Name} - {achievementProvider.TemporarySource} - {Serialization.ToJson(gameAchievements)}");
                 }
                 else
                 {
-                    Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementSource}) - KO");
+                    Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.TemporarySource}) - KO");
                 }
             }
             else
             {
-                Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementSource}) - No Achievement Client fits constraints");
+                Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.TemporarySource}) - No Achievement Client fits constraints");
             }
 
             gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
@@ -791,59 +791,22 @@ namespace SuccessStory.Services
             TEMP_EXOPHASE,
         }
 
-        public static AchievementSource GetAchievementSource(SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        /// <summary>
+        /// Determine what providers can be used for achivements on the target game
+        /// </summary>
+        /// <param name="settings"></param>
+        /// <param name="game"></param>
+        /// <param name="ignoreSpecial"></param>
+        /// <returns></returns>
+        public static GenericAchievements GetAchievementSource(SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            foreach (var Provider in AchievementProviders)
-            {
-                AchievementSource candidateSource = Provider.Value.CheckAchivementSourceGameNameOnly(game.Name, ignoreSpecial);
-                if (candidateSource != AchievementSource.None)
-                {
-                    return candidateSource;
-                }
-            }
-
             ExternalPlugin pluginType = PlayniteTools.GetPluginType(game.PluginId);
-            foreach (var Provider in AchievementProviders)
-            {
-                AchievementSource candidateSource = Provider.Value.GetAchievementSourceFromLibraryPlugin(pluginType, settings, game);
-                if (candidateSource != AchievementSource.None)
-                {
-                    return candidateSource;
-                }
-            }
-
-
-            if (game.GameActions != null)
-            {
-                foreach (GameAction action in game.GameActions)
-                {
-                    if (!action.IsPlayAction || action.EmulatorId == Guid.Empty)
-                    {
-                        continue;
-                    }
-
-                    Emulator emulator = API.Instance.Database.Emulators.FirstOrDefault(e => e.Id == action.EmulatorId);
-                    if (emulator == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var Provider in AchievementProviders)
-                    {
-
-                        AchievementSource candidateSource = Provider.Value.GetAchievementSourceFromEmulator(settings, game);
-                        if (candidateSource != AchievementSource.None)
-                        {
-                            return candidateSource;
-                        }
-                    }
-                }
-
-                return AchievementSource.None;
-            }
-
-            //any game can still get local achievements when that's enabled
-            return settings.EnableLocal ? AchievementSource.Local : AchievementSource.None;
+            return AchievementProviders
+                .Select(provider => (provider: provider, rank: provider.Value.CheckAchivementSourceRank(pluginType, settings, game)))
+                .Where(dr => dr.rank > 0)
+                .OrderByDescending(dr => dr.rank)
+                .Select(dr => dr.provider.Value)
+                .FirstOrDefault();
         }
 
         /// <summary>
@@ -856,8 +819,8 @@ namespace SuccessStory.Services
         /// <returns>true when achievements can be retrieved for the supplied game</returns>
         public static bool VerifToAddOrShow(SuccessStory plugin, IPlayniteAPI playniteApi, SuccessStorySettings settings, Game game)
         {
-            AchievementSource achievementSource = GetAchievementSource(settings, game);
-            if (!AchievementProviders.TryGetValue(achievementSource, out GenericAchievements achievementProvider))
+            GenericAchievements achievementProvider = GetAchievementSource(settings, game);
+            if (achievementProvider == null)
             {
                 return false;
             }
@@ -867,7 +830,7 @@ namespace SuccessStory.Services
                 return achievementProvider.ValidateConfiguration();
             }
 
-            Common.LogDebug(true, $"VerifToAddOrShow() find no action for {achievementSource}");
+            Common.LogDebug(true, $"VerifToAddOrShow() find no action for {achievementProvider.TemporarySource}");
             return false;
         }
         public bool VerifAchievementsLoad(Guid gameID)

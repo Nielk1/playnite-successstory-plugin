@@ -26,13 +26,13 @@ namespace SuccessStory.Clients
     // https://andshrew.github.io/PlayStation-Trophies/#/APIv2
     class PSNAchievements : GenericAchievements
     {
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.GogLibrary && settings.EnablePsn)
             {
-                return AchievementSource.Playstation;
+                return 100;
             }
-            return AchievementSource.None;
+            return 0;
         }
 
 

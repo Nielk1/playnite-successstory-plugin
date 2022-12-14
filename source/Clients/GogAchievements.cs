@@ -21,13 +21,13 @@ namespace SuccessStory.Clients
     }
     class GogAchievements : GenericAchievements
     {
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.GogLibrary && settings.EnableGog)
             {
-                return AchievementSource.GOG;
+                return 100;
             }
-            return AchievementSource.None;
+            return 0;
         }
 
 

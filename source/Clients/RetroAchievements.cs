@@ -43,18 +43,38 @@ namespace SuccessStory.Clients
     }
     class RetroAchievements : GenericAchievements
     {
-        public override AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            // TODO With the emulator migration problem emulator.BuiltInConfigId is null
-            // TODO emulator.BuiltInConfigId = "retroarch" is limited; other emulators has RA
-            string PlatformName = game.Platforms.FirstOrDefault().Name;
-            Guid PlatformId = game.Platforms.FirstOrDefault().Id;
-            int consoleID = settings.RaConsoleAssociateds.Find(x => x.Platforms.Find(y => y.Id == PlatformId) != null)?.RaConsoleId ?? 0;
-            if (settings.EnableRetroAchievements && consoleID != 0)
+            if (game.GameActions != null)
             {
-                return AchievementSource.RetroAchievements;
+                foreach (GameAction action in game.GameActions)
+                {
+                    if (!action.IsPlayAction || action.EmulatorId == Guid.Empty)
+                    {
+                        continue;
+                    }
+
+                    Emulator emulator = API.Instance.Database.Emulators.FirstOrDefault(e => e.Id == action.EmulatorId);
+                    if (emulator == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var Provider in AchievementProviders)
+                    {
+                        // TODO With the emulator migration problem emulator.BuiltInConfigId is null
+                        // TODO emulator.BuiltInConfigId = "retroarch" is limited; other emulators has RA
+                        string PlatformName = game.Platforms.FirstOrDefault().Name;
+                        Guid PlatformId = game.Platforms.FirstOrDefault().Id;
+                        int consoleID = settings.RaConsoleAssociateds.Find(x => x.Platforms.Find(y => y.Id == PlatformId) != null)?.RaConsoleId ?? 0;
+                        if (settings.EnableRetroAchievements && consoleID != 0)
+                        {
+                            return 50;
+                        }
+                    }
+                }
             }
-            return AchievementSource.None;
+            return 0;
         }
 
 

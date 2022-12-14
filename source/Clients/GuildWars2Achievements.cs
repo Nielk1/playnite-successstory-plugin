@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using CommonPluginsShared.Extensions;
 using SuccessStory.Views;
+using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
@@ -23,13 +24,13 @@ namespace SuccessStory.Clients
     }
     class GuildWars2Achievements : GenericAchievements
     {
-        public override AchievementSource CheckAchivementSourceGameNameOnly(string name, bool ignoreSpecial)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            if (name.IsEqual("Guild Wars 2"))
+            if (game.Name.IsEqual("Guild Wars 2"))
             {
-                return AchievementSource.GuildWars2;
+                return 200;
             }
-            return AchievementSource.None;
+            return 0;
         }
         public override dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
         {

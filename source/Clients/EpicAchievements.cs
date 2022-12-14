@@ -16,13 +16,13 @@ namespace SuccessStory.Clients
 {
     class EpicAchievements : GenericAchievements
     {
-        public override AchievementSource GetAchievementSourceFromLibraryPlugin(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             if (pluginType == ExternalPlugin.EpicLibrary && settings.EnableEpic)
             {
-                return AchievementSource.Epic;
+                return 100;
             }
-            return AchievementSource.None;
+            return 0;
         }
 
 

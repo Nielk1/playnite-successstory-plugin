@@ -355,15 +355,20 @@ namespace SuccessStory
         // To add new game menu items override GetGameMenuItems
         public override IEnumerable<GameMenuItem> GetGameMenuItems(GetGameMenuItemsArgs args)
         {
+            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
+            if ((args.Games?.Count ?? 0) == 0)
+            {
+                return gameMenuItems;
+            }
+
             Game GameMenu = args.Games.First();
             List<Guid> Ids = args.Games.Select(x => x.Id).ToList();
 
             // TODO: for multiple games, either check if any of them could have achievements, or just assume so
-            var achievementSource = SuccessStoryDatabase.GetAchievementSource(PluginSettings.Settings, GameMenu);
-            bool GameCouldHaveAchievements = achievementSource != SuccessStoryDatabase.AchievementSource.None;
+            GenericAchievements achievementSource = SuccessStoryDatabase.GetAchievementSource(PluginSettings.Settings, GameMenu);
+            bool GameCouldHaveAchievements = achievementSource != null;
             GameAchievements gameAchievements = PluginDatabase.Get(GameMenu, true);
 
-            List<GameMenuItem> gameMenuItems = new List<GameMenuItem>();
 
             if (!gameAchievements.IsIgnored)
             {
@@ -468,6 +473,7 @@ namespace SuccessStory
                     }
                 }
 
+                // We are now in the manual stage rather than the automatic remote data source stage, so time to check for a manual override, and if not go full manual
                 bool DidManualOverride = false;
                 foreach (var Provider in AchievementProviders)
                 {
@@ -521,7 +527,7 @@ namespace SuccessStory
                     }
                 }
 
-                if (achievementSource == SuccessStoryDatabase.AchievementSource.Local && gameAchievements.HasData && !gameAchievements.IsManual)
+                if ((achievementSource is LocalAchievements) && gameAchievements.HasData && !gameAchievements.IsManual)
                 {
                     gameMenuItems.Add(new GameMenuItem
                     {

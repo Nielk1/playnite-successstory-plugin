@@ -10,6 +10,7 @@ using System.Xml.Linq;
 using CommonPluginsShared.Extensions;
 using Playnite.SDK;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using static CommonPluginsShared.PlayniteTools;
 
 namespace SuccessStory.Clients
 {
@@ -22,13 +23,33 @@ namespace SuccessStory.Clients
     }
     class Rpcs3Achievements : GenericAchievements
     {
-        public override AchievementSource GetAchievementSourceFromEmulator(SuccessStorySettings settings, Game game)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
-            if (PlayniteTools.GameUseRpcs3(game) && settings.EnableRpcs3Achievements)
+            if (game.GameActions != null)
             {
-                return AchievementSource.RPCS3;
+                foreach (GameAction action in game.GameActions)
+                {
+                    if (!action.IsPlayAction || action.EmulatorId == Guid.Empty)
+                    {
+                        continue;
+                    }
+
+                    Emulator emulator = API.Instance.Database.Emulators.FirstOrDefault(e => e.Id == action.EmulatorId);
+                    if (emulator == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var Provider in AchievementProviders)
+                    {
+                        if (PlayniteTools.GameUseRpcs3(game) && settings.EnableRpcs3Achievements)
+                        {
+                            return 50;
+                        }
+                    }
+                }
             }
-            return AchievementSource.None;
+            return 0;
         }
 
 
