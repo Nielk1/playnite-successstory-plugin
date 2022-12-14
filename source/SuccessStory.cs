@@ -527,7 +527,7 @@ namespace SuccessStory
                     }
                 }
 
-                if ((achievementSource is LocalAchievements) && gameAchievements.HasData && !gameAchievements.IsManual)
+                /*if ((achievementSource is LocalAchievements) && gameAchievements.HasData && !gameAchievements.IsManual)
                 {
                     gameMenuItems.Add(new GameMenuItem
                     {
@@ -541,7 +541,7 @@ namespace SuccessStory
                             });
                         }
                     });
-                }
+                }*/
             }
             else
             {

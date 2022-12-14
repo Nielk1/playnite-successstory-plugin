@@ -1182,7 +1182,9 @@ namespace SuccessStory.Clients
                     foreach (KeyValue AchievementPercentagesData in GlobalAchievementPercentagesForApp["achievements"]["achievement"].Children)
                     {
                         string ApiName = AchievementPercentagesData.Children.Find(x => x.Name == "name")?.Value;
-                        float.TryParse(AchievementPercentagesData.Children.Find(x => x.Name == "percent")?.Value?.Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator), out float Percent);
+
+                        // just fix the number crudely since we know it won't ever contain a digit group seperator, just a decimal ones
+                        float.TryParse(AchievementPercentagesData.Children.Find(x => x.Name == "percent")?.Value?.Replace("%", string.Empty).Replace(",", "."), NumberStyles.Any, CultureInfo.InvariantCulture, out float Percent);
 
                         Common.LogDebug(true, $"{AppId} - ApiName: {ApiName} - Percent: {Percent}");
 
@@ -1269,7 +1271,8 @@ namespace SuccessStory.Clients
                         float Percent = 0;
                         if (achieveRow.QuerySelector(".achievePercent") != null)
                         {
-                            Percent = float.Parse(achieveRow.QuerySelector(".achievePercent").InnerHtml.Replace("%", string.Empty).Replace(".", CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator));
+                            // just fix the number crudely since we know it won't ever contain a digit group seperator, just a decimal ones
+                            Percent = float.Parse(achieveRow.QuerySelector(".achievePercent").InnerHtml.Replace("%", string.Empty).Replace(",", "."), CultureInfo.InvariantCulture);
                         }
 
                         AllAchievements.Find(x => x.Name.IsEqual(Name)).Percent = Percent;
