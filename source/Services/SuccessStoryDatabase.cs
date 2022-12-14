@@ -213,7 +213,7 @@ namespace SuccessStory.Services
 
         // TODO: remove tight coupling here
         /// <summary>
-        /// Generate database achivements for the game if achievement exist and game not exist in database.
+        /// Called by Refresh on non manual type sources
         /// </summary>
         /// <param name="game"></param>
         public override GameAchievements GetWeb(Guid Id)
@@ -1066,7 +1066,7 @@ namespace SuccessStory.Services
                             {
                                 if (SteamConfig)
                                 {
-                                    gameAchievements.Items = steamAchievements.GetGlobalAchievementPercentagesForApp(AppId, gameAchievements.Items);
+                                    gameAchievements.Items = steamAchievements.GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
                                 }
                                 else
                                 {
