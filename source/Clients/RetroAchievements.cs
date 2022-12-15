@@ -36,7 +36,7 @@ namespace SuccessStory.Clients
 
     class RetroAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.RetroAchievements] = new RetroAchievements();
         }
@@ -99,7 +99,6 @@ namespace SuccessStory.Clients
 
         public RetroAchievements() : base("RetroAchievements")
         {
-            TemporarySource = AchievementSource.RetroAchievements;
         }
 
 

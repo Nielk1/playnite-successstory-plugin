@@ -18,7 +18,7 @@ namespace SuccessStory.Clients
 {
     class GenshinImpactAchivementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.GenshinImpact] = new GenshinImpactAchievements();
         }
@@ -142,7 +142,6 @@ namespace SuccessStory.Clients
 
         public GenshinImpactAchievements() : base("GenshinImpact", CodeLang.GetGenshinLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-            TemporarySource = AchievementSource.GenshinImpact;
         }
 
 

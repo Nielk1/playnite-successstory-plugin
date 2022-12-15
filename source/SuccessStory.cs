@@ -678,7 +678,7 @@ namespace SuccessStory
                     Description = resources.GetString("LOCSsRefreshRaretyManual"),
                     Action = (mainMenuItem) =>
                     {
-                        PluginDatabase.RefreshRarety();
+                        PluginDatabase.RefreshRaretyForAllManualOnly();
                     }
                 });
 

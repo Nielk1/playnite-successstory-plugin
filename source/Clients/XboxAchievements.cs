@@ -21,7 +21,7 @@ namespace SuccessStory.Clients
 {
     class XboxAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.Xbox] = new XboxAchievements();
         }
@@ -84,7 +84,6 @@ namespace SuccessStory.Clients
 
         public XboxAchievements() : base("Xbox", CodeLang.GetXboxLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-            TemporarySource = AchievementSource.Xbox;
         }
 
 
@@ -132,11 +131,11 @@ namespace SuccessStory.Clients
             }
 
             // Set rarity from Exophase
-            if (gameAchievements.HasAchievements)
+            /*if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Xbox);
-            }
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Xbox);
+            }*/
 
 
             return gameAchievements;

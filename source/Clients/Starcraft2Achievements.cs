@@ -18,7 +18,7 @@ namespace SuccessStory.Clients
 {
     class Starcraft2AchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.Starcraft2] = new Starcraft2Achievements();
         }
@@ -58,7 +58,6 @@ namespace SuccessStory.Clients
 
         public Starcraft2Achievements() : base("Starcraft 2", PluginDatabase.PlayniteApi.ApplicationSettings.Language)
         {
-            TemporarySource = AchievementSource.Starcraft2;
         }
 
 
@@ -151,11 +150,11 @@ namespace SuccessStory.Clients
 
 
             // Set rarity from Exophase
-            if (gameAchievements.HasAchievements)
+            /*if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Starcraft2);
-            }
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Starcraft2);
+            }*/
 
 
             return gameAchievements;

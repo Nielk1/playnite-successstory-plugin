@@ -19,7 +19,11 @@ namespace SuccessStory.Clients
 {
     interface IAchievementFactory
     {
-        void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders);
+        void BuildClient(
+            Dictionary<AchievementSource, GenericAchievements> Providers,
+            Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders,
+            Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters
+        );
     }
     interface ISearchableManualAchievements
     {
@@ -30,10 +34,13 @@ namespace SuccessStory.Clients
         GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements);
         GameAchievements GetManualAchievements(Game game, SearchResult searchResult);
     }
-
+    interface IMetadataAugmentAchievements
+    {
+        GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements);
+    }
     public abstract class GenericAchievements
     {
-        internal AchievementSource TemporarySource { get; set; }
+        // TODO: make this function also detect if a specific provider is already attached, which is critical for manual achivements
         public virtual int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
         {
             return 0;

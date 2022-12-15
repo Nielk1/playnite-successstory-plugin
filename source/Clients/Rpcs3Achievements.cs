@@ -16,7 +16,7 @@ namespace SuccessStory.Clients
 {
     class Rpcs3AchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.RPCS3] = new Rpcs3Achievements();
         }
@@ -57,7 +57,6 @@ namespace SuccessStory.Clients
 
         public Rpcs3Achievements() : base("RPCS3")
         {
-            TemporarySource = AchievementSource.RPCS3;
         }
 
 

@@ -21,7 +21,7 @@ namespace SuccessStory.Clients
 {
     class OverwatchAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.Overwatch] = new OverwatchAchievements();
         }
@@ -97,7 +97,6 @@ namespace SuccessStory.Clients
 
         public OverwatchAchievements() : base("Overwatch", CodeLang.GetEpicLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-            TemporarySource = AchievementSource.Overwatch;
             UrlOverwatchProfilLocalised = string.Format(UrlOverwatchProfilLocalised, LocalLang);
         }
 
@@ -202,11 +201,11 @@ namespace SuccessStory.Clients
             }
 
             // Set rarity from Exophase
-            if (gameAchievements.HasAchievements)
+            /*if (gameAchievements.HasAchievements)
             {
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Overwatch);
-            }
+                exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Overwatch);
+            }*/
 
 
             return gameAchievements;

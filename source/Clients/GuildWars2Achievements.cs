@@ -17,7 +17,7 @@ namespace SuccessStory.Clients
 {
     class GuildWars2AchivementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.GuildWars2] = new GuildWars2Achievements();
         }
@@ -56,7 +56,6 @@ namespace SuccessStory.Clients
 
         public GuildWars2Achievements() : base("GuildWars2", CodeLang.GetOriginLangCountry(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-            TemporarySource = AchievementSource.GuildWars2;
         }
 
 

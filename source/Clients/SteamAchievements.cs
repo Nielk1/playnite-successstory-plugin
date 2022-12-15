@@ -29,16 +29,14 @@ namespace SuccessStory.Clients
 {
     class SteamAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
-            Providers[AchievementSource.Steam] = new SteamAchievements();
-
-            SteamAchievements tmp = new LocalAchievements();
-            Providers[AchievementSource.Local] = tmp;
-            ManualSearchProviders[AchievementSource.Local] = tmp;
+            SteamAchievements tmp = new SteamAchievements();
+            Providers[AchievementSource.Steam] = tmp;
+            ManualSearchProviders[AchievementSource.Steam] = tmp;
         }
     }
-    class LocalAchievements : SteamAchievements
+    /*class LocalAchievements : SteamAchievements
     {
         public LocalAchievements()
         {
@@ -52,8 +50,8 @@ namespace SuccessStory.Clients
             }
             return 0;
         }
-    }
-    class SteamAchievements : GenericAchievements, ISearchableManualAchievements
+    }*/
+    class SteamAchievements : GenericAchievements, ISearchableManualAchievements, IMetadataAugmentAchievements
     {
         protected static SteamApi _steamApi;
         internal static SteamApi steamApi
@@ -72,7 +70,7 @@ namespace SuccessStory.Clients
 
         private IHtmlDocument HtmlDocument { get; set; } = null;
 
-        protected bool IsLocal { get; set; } = false;
+        //protected bool IsLocal { get; set; } = false;
         //private bool IsManual { get; set; } = false;
  
         private static string SteamId { get; set; } = string.Empty;
@@ -90,7 +88,6 @@ namespace SuccessStory.Clients
 
         public SteamAchievements() : base("Steam", CodeLang.GetSteamLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))
         {
-            TemporarySource = AchievementSource.Steam;
         }
 
 
@@ -213,7 +210,7 @@ namespace SuccessStory.Clients
         {
             int AppId = 0;
             int.TryParse(game.GameId, out AppId);
-            return GetAchievementsInternal(game, AppId, !IsLocal);
+            return GetAchievementsInternal(game, AppId, true);
         }
 
 
@@ -231,7 +228,7 @@ namespace SuccessStory.Clients
                 return gameAchievements;
             }
 
-            logger.Info($"GetAchievementsInternal() - IsLocal : {IsLocal}, ProgressOnSteam : {ProgressOnSteam}, EnableSteamWithoutWebApi: {PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi}, SteamIsPrivate: {PluginDatabase.PluginSettings.Settings.SteamIsPrivate}");
+            logger.Info($"GetAchievementsInternal() - ProgressOnSteam : {ProgressOnSteam}, EnableSteamWithoutWebApi: {PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi}, SteamIsPrivate: {PluginDatabase.PluginSettings.Settings.SteamIsPrivate}");
 
             if (AppId != 0 && ProgressOnSteam)
             {
@@ -377,7 +374,7 @@ namespace SuccessStory.Clients
                                 Common.LogError(ex, false, $"Error on AchievementsData({AppId}, {LocalLang})", true, PluginDatabase.PluginName);
                             }
 
-                            try
+                            /*try
                             {
                                 var availableGameStats = SchemaForGame.Children.Find(x => x.Name.IsEqual("availableGameStats"));
 
@@ -420,10 +417,10 @@ namespace SuccessStory.Clients
                             catch (Exception ex)
                             {
                                 Common.LogError(ex, false, $"Error on AvailableGameStats({AppId}, {LocalLang})", true, PluginDatabase.PluginName);
-                            }
+                            }*/
 
                             gameAchievements.Items = AllAchievements;
-                            gameAchievements.ItemsStats = AllStats;
+                            //gameAchievements.ItemsStats = AllStats;
 
                             if (gameAchievements.HasAchievements)
                             {
@@ -442,7 +439,7 @@ namespace SuccessStory.Clients
             // Set rarity
             if (gameAchievements.HasAchievements)
             {
-                if (!IsLocal && (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi || PluginDatabase.PluginSettings.Settings.SteamIsPrivate))
+                if (ProgressOnSteam && (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi || PluginDatabase.PluginSettings.Settings.SteamIsPrivate))
                 {
                     try
                     {
@@ -479,8 +476,10 @@ namespace SuccessStory.Clients
                         }
                     });
                 }
+                /*
                 ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSource.Steam);
+                exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSourceOld.Steam);
+                */
             }
 
             return gameAchievements;
@@ -608,22 +607,22 @@ namespace SuccessStory.Clients
 
         public override bool EnabledInSettings()
         {
-            if (IsLocal)
-            {
-                return PluginDatabase.PluginSettings.Settings.EnableLocal;
-            }
-            else
-            {
+            //if (IsLocal)
+            //{
+            //    return PluginDatabase.PluginSettings.Settings.EnableLocal;
+            //}
+            //else
+            //{
                 return PluginDatabase.PluginSettings.Settings.EnableSteam;
-            }
+            //}
         }
         #endregion
 
 
-        public void SetLocal()
-        {
-            IsLocal = true;
-        }
+        //public void SetLocal()
+        //{
+        //    IsLocal = true;
+        //}
 
         //public void SetManual()
         //{
@@ -1571,5 +1570,28 @@ namespace SuccessStory.Clients
             ));
         }
         #endregion
+
+
+
+
+        public GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements)
+        {
+            if (sourceName == "steam")
+            {
+                int.TryParse(Regex.Match(gameAchievements.SourcesLink.Url, @"\d+").Value, out int AppId);
+                if (AppId != 0)
+                {
+                    if (IsConfigured())
+                    {
+                        gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
+                    }
+                    else
+                    {
+                        logger.Warn($"No Steam config");
+                    }
+                }
+            }
+            return gameAchievements;
+        }
     }
 }

@@ -17,13 +17,18 @@ namespace SuccessStory.Clients
 {
     class TrueAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             Providers[AchievementSource.TEMP_TRUE] = new TrueAchievements();
         }
     }
-    class TrueAchievements : GenericAchievements
+    class TrueAchievements : GenericAchievements, IMetadataAugmentAchievements
     {
+        public GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements)
+        {
+            return gameAchievements;
+        }
+
         public override bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
         {
             bool updated = false;

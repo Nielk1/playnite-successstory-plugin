@@ -34,14 +34,14 @@ namespace SuccessStory.Clients
 
     class ExophaseAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders)
+        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             ExophaseAchievements tmp = new ExophaseAchievements();
-            Providers[AchievementSource.TEMP_EXOPHASE] = tmp;
-            ManualSearchProviders[AchievementSource.TEMP_EXOPHASE] = tmp;
+            Providers[AchievementSource.Exophase] = tmp;
+            ManualSearchProviders[AchievementSource.Exophase] = tmp;
         }
     }
-    class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements
+    class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements, IMetadataAugmentAchievements
     {
         private const string UrlExophaseSearch = @"https://api.exophase.com/public/archive/games?q={0}&sort=added";
         private const string UrlExophase = @"https://www.exophase.com";
@@ -134,7 +134,7 @@ namespace SuccessStory.Clients
 
 
 
-
+        // TODO: needed once manuals can refresh
         public override GameAchievements GetAchievements(Game game)
         {
             throw new NotImplementedException();
@@ -290,7 +290,7 @@ namespace SuccessStory.Clients
 
 
 
-        private string GetAchievementsPageUrl(GameAchievements gameAchievements, Services.SuccessStoryDatabase.AchievementSource source)
+        private string GetAchievementsPageUrl(GameAchievements gameAchievements, GenericAchievements source)
         {
             bool UsedSplit = false;
 
@@ -337,7 +337,7 @@ namespace SuccessStory.Clients
         /// </summary>
         /// <param name="gameAchievements"></param>
         /// <param name="source"></param>
-        public void SetRarety(GameAchievements gameAchievements, Services.SuccessStoryDatabase.AchievementSource source)
+        public void SetRarety(GameAchievements gameAchievements, GenericAchievements source)
         {
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
@@ -380,7 +380,7 @@ namespace SuccessStory.Clients
         }
 
 
-        public void SetMissingDescription(GameAchievements gameAchievements, Services.SuccessStoryDatabase.AchievementSource source)
+        public void SetMissingDescription(GameAchievements gameAchievements, GenericAchievements source)
         {
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
@@ -425,32 +425,39 @@ namespace SuccessStory.Clients
             }
         }
 
-        private static bool PlatformAndProviderMatch(SearchResult exophaseGame, GameAchievements playniteGame, Services.SuccessStoryDatabase.AchievementSource achievementSource)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="exophaseGame"></param>
+        /// <param name="playniteGame"></param>
+        /// <param name="achievementSource"></param>
+        /// <returns></returns>
+        private static bool PlatformAndProviderMatch(SearchResult exophaseGame, GameAchievements playniteGame, GenericAchievements achievementSource)
         {
-            switch (achievementSource)
+            switch (achievementSource.ClientName)
             {
                 //PC: match service
-                case Services.SuccessStoryDatabase.AchievementSource.Steam:
+                case "Steam":
                     return exophaseGame.Platforms.Contains("Steam", StringComparer.InvariantCultureIgnoreCase);
-                case Services.SuccessStoryDatabase.AchievementSource.GOG:
+                case "GOG":
                     return exophaseGame.Platforms.Contains("GOG", StringComparer.InvariantCultureIgnoreCase);
-                case Services.SuccessStoryDatabase.AchievementSource.Origin:
+                case "EA":
                     return exophaseGame.Platforms.Contains("Electronic Arts", StringComparer.InvariantCultureIgnoreCase);
-                case Services.SuccessStoryDatabase.AchievementSource.RetroAchievements:
+                case "RetroAchievements":
                     return exophaseGame.Platforms.Contains("Retro", StringComparer.InvariantCultureIgnoreCase);
-                case Services.SuccessStoryDatabase.AchievementSource.Overwatch:
-                case Services.SuccessStoryDatabase.AchievementSource.Starcraft2:
-                case Services.SuccessStoryDatabase.AchievementSource.Wow:
+                case "Overwatch":
+                case "Starcraft 2":
+                case "Wow":
                     return exophaseGame.Platforms.Contains("Blizzard", StringComparer.InvariantCultureIgnoreCase);
 
                 //Console: match platform
-                case Services.SuccessStoryDatabase.AchievementSource.Playstation:
-                case Services.SuccessStoryDatabase.AchievementSource.Xbox:
-                case Services.SuccessStoryDatabase.AchievementSource.RPCS3:
+                case "PSN":
+                case "Xbox":
+                case "RPCS3":
                     return PlatformsMatch(exophaseGame, playniteGame);
 
-                case Services.SuccessStoryDatabase.AchievementSource.None:
-                case Services.SuccessStoryDatabase.AchievementSource.Local:
+                //case Services.SuccessStoryDatabase.AchievementSource.None:
+                //case Services.SuccessStoryDatabase.AchievementSource.Local:
                 default:
                     return false;
             }
@@ -492,5 +499,17 @@ namespace SuccessStory.Clients
             return false;
         }
         #endregion
+
+
+
+
+        public GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements)
+        {
+            if (sourceName == "exophase")
+            {
+                SetRarety(gameAchievements, AchievementSourceOld.Local);
+            }
+            return gameAchievements;
+        }
     }
 }

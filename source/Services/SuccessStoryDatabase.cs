@@ -33,6 +33,7 @@ namespace SuccessStory.Services
 
         private static Dictionary<AchievementSource, GenericAchievements> _achievementProviders { get; set; }
         private static Dictionary<AchievementSource, ISearchableManualAchievements> _achievementManualSearchProviders { get; set; }
+        private static Dictionary<AchievementSource, IMetadataAugmentAchievements> _achievementMetadataAugmenters { get; set; }
         private static object _achievementProvidersLock => new object();
         internal static Dictionary<AchievementSource, GenericAchievements> AchievementProviders
         {
@@ -50,6 +51,14 @@ namespace SuccessStory.Services
                 return _achievementManualSearchProviders;
             }
         }
+        internal static Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters
+        {
+            get
+            {
+                PrepareAchievmentProviders();
+                return _achievementMetadataAugmenters;
+            }
+        }
         private static void PrepareAchievmentProviders()
         {
             lock (_achievementProvidersLock)
@@ -58,6 +67,7 @@ namespace SuccessStory.Services
                 {
                     _achievementProviders = new Dictionary<AchievementSource, GenericAchievements>();
                     _achievementManualSearchProviders = new Dictionary<AchievementSource, ISearchableManualAchievements>();
+                    _achievementMetadataAugmenters = new Dictionary<AchievementSource, IMetadataAugmentAchievements>();
 
                     // for now just scan ourself, we might be able to dynamicly load from other plugins but we'd need to remove all tight coupling first
                     foreach (Type item in typeof(IAchievementFactory).GetTypeInfo().Assembly.GetTypes())
@@ -79,7 +89,7 @@ namespace SuccessStory.Services
                                     IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item, paramList);
                                     */
                                     IAchievementFactory plugin = (IAchievementFactory)Activator.CreateInstance(item);
-                                    plugin.BuildClient(_achievementProviders, _achievementManualSearchProviders);
+                                    plugin.BuildClient(_achievementProviders, _achievementManualSearchProviders, _achievementMetadataAugmenters);
                                 }
                                 catch { }
                             }
@@ -230,7 +240,7 @@ namespace SuccessStory.Services
                     RetroAchievements retroAchievementsProvider = achievementProvider as RetroAchievements;
                     PSNAchievements psnAchievementsProvider = achievementProvider as PSNAchievements;
 
-                    logger.Info($"Used {achievementProvider?.ToString()} for {game?.Name} - {game?.Id}");
+                    logger.Info($"Used {achievementProvider.GetType()} for {game?.Name} - {game?.Id}");
 
                     if (retroAchievementsProvider != null && !SuccessStory.IsFromMenu)
                     {
@@ -258,24 +268,29 @@ namespace SuccessStory.Services
 
                     gameAchievements = achievementProvider.GetAchievements(game);
 
+
                     if (retroAchievementsProvider != null)
                     {
                         gameAchievements.RAgameID = retroAchievementsProvider.GameId;
                     }
 
-                    Common.LogDebug(true, $"Achievements for {game.Name} - {achievementProvider.TemporarySource} - {Serialization.ToJson(gameAchievements)}");
+                    Common.LogDebug(true, $"Achievements for {game.Name} - {achievementProvider.GetType()} - {Serialization.ToJson(gameAchievements)}");
                 }
                 else
                 {
-                    Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.TemporarySource}) - KO");
+                    Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.GetType()}) - KO");
                 }
             }
             else
             {
-                Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.TemporarySource}) - No Achievement Client fits constraints");
+                Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.GetType()}) - No Achievement Client fits constraints");
             }
 
+            // TODO: metadata update here for rarity
+            gameAchievements = RefreshRarity(gameAchievements);
             gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
+
+            // TODO: do we need an AddOrUpdate here?
 
             if (!(gameAchievements?.HasAchievements ?? false))
             {
@@ -289,6 +304,41 @@ namespace SuccessStory.Services
             return gameAchievements;
         }
 
+        private GameAchievements RefreshRarity(GameAchievements gameAchievements)
+        {
+            string sourceName = gameAchievements.SourcesLink?.Name?.ToLower();
+
+            foreach (var provider in AchievementMetadataAugmenters)
+            {
+                provider.Value.RefreshRarity(sourceName, gameAchievements);
+            }
+
+            switch (sourceName)
+            {
+                case "steam":
+                    int.TryParse(Regex.Match(gameAchievements.SourcesLink.Url, @"\d+").Value, out int AppId);
+                    if (AppId != 0)
+                    {
+                        if (steamAchievements.IsConfigured())
+                        {
+                            gameAchievements.Items = steamAchievements.GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
+                        }
+                        else
+                        {
+                            logger.Warn($"No Steam config");
+                        }
+                    }
+                    break;
+                case "exophase":
+                    exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Local);
+                    break;
+                default:
+                    logger.Warn($"No sourcesLink for {gameAchievements.Name}");
+                    break;
+            }
+
+            return gameAchievements;
+        }
 
         private GameAchievements SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
         {
@@ -768,27 +818,26 @@ namespace SuccessStory.Services
             return new AchievementsGraphicsDataCount { Labels = GraphicsAchievementsLabels, Series = SourceAchievementsSeries };
         }
 
-        public enum AchievementSource
+        public enum AchievementSource : UInt64
         {
-            None,
-            Local,
-            Playstation,
-            Steam,
-            GOG,
-            Epic,
-            Origin,
-            Xbox,
-            RetroAchievements,
-            RPCS3,
-            Overwatch,
-            Starcraft2,
-            Wow,
-            GenshinImpact,
-            GuildWars2,
+            //None,
+            //Local,
+            Playstation       = 0x7461747379616C50, // Playstat
+            Steam             = 0x0000006D61657453, // Steam --
+            GOG               = 0x0000000000474F47, // GOG ----
+            Epic              = 0x0000000063697045, // Epic ---
+            Origin            = 0x00006E696769724F, // Origin -
+            Xbox              = 0x00000000786F6258, // Xbox ---
+            RetroAchievements = 0x766863416F727452, // RtroAchv
+            RPCS3             = 0x0000003353435052, // RPCS3 --
+            Overwatch         = 0x686374617772764F, // Ovrwatch
+            Starcraft2        = 0x3274667263727453, // Strcrft2
+            Wow               = 0x0000000000776F57, // Wow ----
+            GenshinImpact     = 0x706D496E68736E47, // GnshnImp
+            GuildWars2        = 0x3273726157646C47, // GldWars2
+            Exophase          = 0x65736168706F7845, // Exophase
 
-
-            TEMP_TRUE,
-            TEMP_EXOPHASE,
+            TEMP_TRUE = 1,
         }
 
         /// <summary>
@@ -830,7 +879,7 @@ namespace SuccessStory.Services
                 return achievementProvider.ValidateConfiguration();
             }
 
-            Common.LogDebug(true, $"VerifToAddOrShow() find no action for {achievementProvider.TemporarySource}");
+            Common.LogDebug(true, $"VerifToAddOrShow() find no action for {achievementProvider.GetType()}");
             return false;
         }
         public bool VerifAchievementsLoad(Guid gameID)
@@ -1027,7 +1076,8 @@ namespace SuccessStory.Services
         }
 
         // TODO: tight coupling here between steam and exophase, purpose of this code yet unknown
-        public void RefreshRarety()
+        // note this only refreshes manual games as that is what it's triggered on
+        public void RefreshRaretyForAllManualOnly()
         {
             GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
                 $"{PluginName} - {resources.GetString("LOCCommonProcessing")}",
@@ -1044,9 +1094,9 @@ namespace SuccessStory.Services
                 activateGlobalProgress.ProgressMaxValue = (double)db.Count();
                 string CancelText = string.Empty;
 
-                ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                SteamAchievements steamAchievements = new SteamAchievements();
-                bool SteamConfig = steamAchievements.IsConfigured();
+                //ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
+                //SteamAchievements steamAchievements = new SteamAchievements();
+                //bool SteamConfig = steamAchievements.IsConfigured();
 
                 foreach (GameAchievements gameAchievements in db)
                 {
@@ -1057,7 +1107,7 @@ namespace SuccessStory.Services
                         break;
                     }
 
-                    string SourceName = gameAchievements.SourcesLink?.Name?.ToLower();
+                    /*string SourceName = gameAchievements.SourcesLink?.Name?.ToLower();
                     switch (SourceName)
                     {
                         case "steam":
@@ -1075,12 +1125,13 @@ namespace SuccessStory.Services
                             }
                             break;
                         case "exophase":
-                            exophaseAchievements.SetRarety(gameAchievements, AchievementSource.Local);
+                            exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Local);
                             break;
                         default:
                             logger.Warn($"No sourcesLink for {gameAchievements.Name}");
                             break;
-                    }
+                    }*/
+                    RefreshRarity(gameAchievements);
 
                     AddOrUpdate(gameAchievements);
                     activateGlobalProgress.CurrentProgressValue++;
