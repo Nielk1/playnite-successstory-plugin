@@ -486,7 +486,7 @@ namespace SuccessStory
                 }
                 if (PluginSettings.Settings.EnableManual && !DidManualOverride)
                 {
-                    if (!gameAchievements.HasData)
+                    if (!gameAchievements.HasData || !gameAchievements.IsManual)
                     {
                         gameMenuItems.Add(new GameMenuItem
                         {
