@@ -20,9 +20,9 @@ namespace SuccessStory.Clients
     interface IAchievementFactory
     {
         void BuildClient(
-            Dictionary<AchievementSource, GenericAchievements> Providers,
-            Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders,
-            Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters
+            Dictionary<string, GenericAchievements> Providers,
+            Dictionary<string, ISearchableManualAchievements> ManualSearchProviders,
+            Dictionary<string, IMetadataAugmentAchievements> AchievementMetadataAugmenters
         );
     }
     interface ISearchableManualAchievements
@@ -36,7 +36,8 @@ namespace SuccessStory.Clients
     }
     interface IMetadataAugmentAchievements
     {
-        GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements);
+        GameAchievements RefreshRarity(GameAchievements gameAchievements);
+        bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements);
     }
     public abstract class GenericAchievements
     {

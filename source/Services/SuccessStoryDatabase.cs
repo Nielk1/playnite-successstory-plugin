@@ -31,11 +31,11 @@ namespace SuccessStory.Services
 
         private bool _isRetroachievements { get; set; }
 
-        private static Dictionary<AchievementSource, GenericAchievements> _achievementProviders { get; set; }
-        private static Dictionary<AchievementSource, ISearchableManualAchievements> _achievementManualSearchProviders { get; set; }
-        private static Dictionary<AchievementSource, IMetadataAugmentAchievements> _achievementMetadataAugmenters { get; set; }
+        private static Dictionary<string, GenericAchievements> _achievementProviders { get; set; }
+        private static Dictionary<string, ISearchableManualAchievements> _achievementManualSearchProviders { get; set; }
+        private static Dictionary<string, IMetadataAugmentAchievements> _achievementMetadataAugmenters { get; set; }
         private static object _achievementProvidersLock => new object();
-        internal static Dictionary<AchievementSource, GenericAchievements> AchievementProviders
+        internal static Dictionary<string, GenericAchievements> AchievementProviders
         {
             get
             {
@@ -43,7 +43,7 @@ namespace SuccessStory.Services
                 return _achievementProviders;
             }
         }
-        internal static Dictionary<AchievementSource, ISearchableManualAchievements> AchievementManualSearchProviders
+        internal static Dictionary<string, ISearchableManualAchievements> AchievementManualSearchProviders
         {
             get
             {
@@ -51,7 +51,7 @@ namespace SuccessStory.Services
                 return _achievementManualSearchProviders;
             }
         }
-        internal static Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters
+        internal static Dictionary<string, IMetadataAugmentAchievements> AchievementMetadataAugmenters
         {
             get
             {
@@ -65,9 +65,9 @@ namespace SuccessStory.Services
             {
                 if (_achievementProviders == null)
                 {
-                    _achievementProviders = new Dictionary<AchievementSource, GenericAchievements>();
-                    _achievementManualSearchProviders = new Dictionary<AchievementSource, ISearchableManualAchievements>();
-                    _achievementMetadataAugmenters = new Dictionary<AchievementSource, IMetadataAugmentAchievements>();
+                    _achievementProviders = new Dictionary<string, GenericAchievements>();
+                    _achievementManualSearchProviders = new Dictionary<string, ISearchableManualAchievements>();
+                    _achievementMetadataAugmenters = new Dictionary<string, IMetadataAugmentAchievements>();
 
                     // for now just scan ourself, we might be able to dynamicly load from other plugins but we'd need to remove all tight coupling first
                     foreach (Type item in typeof(IAchievementFactory).GetTypeInfo().Assembly.GetTypes())
@@ -306,11 +306,9 @@ namespace SuccessStory.Services
 
         private GameAchievements RefreshRarity(GameAchievements gameAchievements)
         {
-            string sourceName = gameAchievements.SourcesLink?.Name?.ToLower();
-
             foreach (var provider in AchievementMetadataAugmenters)
             {
-                gameAchievements = provider.Value.RefreshRarity(sourceName, gameAchievements);
+                gameAchievements = provider.Value.RefreshRarity(gameAchievements);
             }
 
             return gameAchievements;
@@ -794,26 +792,23 @@ namespace SuccessStory.Services
             return new AchievementsGraphicsDataCount { Labels = GraphicsAchievementsLabels, Series = SourceAchievementsSeries };
         }
 
-        public enum AchievementSource : UInt64
+        public static class AchievementSource
         {
-            //None,
-            //Local,
-            Playstation       = 0x7461747379616C50, // Playstat
-            Steam             = 0x0000006D61657453, // Steam --
-            GOG               = 0x0000000000474F47, // GOG ----
-            Epic              = 0x0000000063697045, // Epic ---
-            Origin            = 0x00006E696769724F, // Origin -
-            Xbox              = 0x00000000786F6258, // Xbox ---
-            RetroAchievements = 0x766863416F727452, // RtroAchv
-            RPCS3             = 0x0000003353435052, // RPCS3 --
-            Overwatch         = 0x686374617772764F, // Ovrwatch
-            Starcraft2        = 0x3274667263727453, // Strcrft2
-            Wow               = 0x0000000000776F57, // Wow ----
-            GenshinImpact     = 0x706D496E68736E47, // GnshnImp
-            GuildWars2        = 0x3273726157646C47, // GldWars2
-            Exophase          = 0x65736168706F7845, // Exophase
-
-            TEMP_TRUE = 1,
+            public const string Playstation       = "Playstation";
+            public const string Steam             = "Steam";
+            public const string GOG               = "GOG";
+            public const string Epic              = "Epic";
+            public const string Origin            = "Origin";
+            public const string Xbox              = "Xbox";
+            public const string RetroAchievements = "RetroAchievements";
+            public const string RPCS3             = "RPCS3";
+            public const string Overwatch         = "Overwatch";
+            public const string Starcraft2        = "Starcraft2";
+            public const string Wow               = "Wow";
+            public const string GenshinImpact     = "GenshinImpact";
+            public const string GuildWars2        = "GuildWars2";
+            public const string Exophase          = "Exophase";
+            public const string True              = "True";
         }
 
         /// <summary>

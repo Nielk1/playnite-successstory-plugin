@@ -34,7 +34,7 @@ namespace SuccessStory.Clients
 
     class ExophaseAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
+        public void BuildClient(Dictionary<string, GenericAchievements> Providers, Dictionary<string, ISearchableManualAchievements> ManualSearchProviders, Dictionary<string, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             ExophaseAchievements tmp = new ExophaseAchievements();
             Providers[AchievementSource.Exophase] = tmp;
@@ -301,7 +301,7 @@ namespace SuccessStory.Clients
 
 
 
-        private string GetAchievementsPageUrl(GameAchievements gameAchievements, GenericAchievements source)
+        private string GetAchievementsPageUrl(GameAchievements gameAchievements, AchievementHandler source)
         {
             bool UsedSplit = false;
 
@@ -348,7 +348,7 @@ namespace SuccessStory.Clients
         /// </summary>
         /// <param name="gameAchievements"></param>
         /// <param name="source"></param>
-        public void SetRarety(GameAchievements gameAchievements, GenericAchievements source)
+        public void SetRarety(GameAchievements gameAchievements, AchievementHandler source)
         {
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
@@ -391,7 +391,7 @@ namespace SuccessStory.Clients
         }
 
 
-        public void SetMissingDescription(GameAchievements gameAchievements, GenericAchievements source)
+        public void SetMissingDescription(GameAchievements gameAchievements, AchievementHandler source)
         {
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
@@ -443,9 +443,9 @@ namespace SuccessStory.Clients
         /// <param name="playniteGame"></param>
         /// <param name="achievementSource"></param>
         /// <returns></returns>
-        private static bool PlatformAndProviderMatch(SearchResult exophaseGame, GameAchievements playniteGame, GenericAchievements achievementSource)
+        private static bool PlatformAndProviderMatch(SearchResult exophaseGame, GameAchievements playniteGame, AchievementHandler achievementSource)
         {
-            switch (achievementSource.ClientName)
+            switch (achievementSource.Name)
             {
                 //PC: match service
                 case "Steam":
@@ -514,11 +514,16 @@ namespace SuccessStory.Clients
 
 
 
-        public GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements)
+        public GameAchievements RefreshRarity(GameAchievements gameAchievements)
         {
-            if (sourceName == "exophase")
+            return gameAchievements;
+
+            if (gameAchievements.Handlers != null)
             {
-                //SetRarety(gameAchievements, gameAchievements.GetAssignedHandler());
+                foreach (var handler in gameAchievements.Handlers)
+                {
+                    SetRarety(gameAchievements, handler);
+                }
             }
             return gameAchievements;
         }

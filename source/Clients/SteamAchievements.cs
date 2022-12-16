@@ -29,7 +29,7 @@ namespace SuccessStory.Clients
 {
     class SteamAchievementsFactory : IAchievementFactory
     {
-        public void BuildClient(Dictionary<AchievementSource, GenericAchievements> Providers, Dictionary<AchievementSource, ISearchableManualAchievements> ManualSearchProviders, Dictionary<AchievementSource, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
+        public void BuildClient(Dictionary<string, GenericAchievements> Providers, Dictionary<string, ISearchableManualAchievements> ManualSearchProviders, Dictionary<string, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
         {
             SteamAchievements tmp = new SteamAchievements();
             Providers[AchievementSource.Steam] = tmp;
@@ -1577,20 +1577,26 @@ namespace SuccessStory.Clients
 
 
 
-        public GameAchievements RefreshRarity(string sourceName, GameAchievements gameAchievements)
+        public GameAchievements RefreshRarity(GameAchievements gameAchievements)
         {
-            if (sourceName == "steam")
+            if (gameAchievements.Handlers != null)
             {
-                int.TryParse(Regex.Match(gameAchievements.SourcesLink.Url, @"\d+").Value, out int AppId);
-                if (AppId != 0)
+                foreach (var handler in gameAchievements.Handlers)
                 {
-                    if (IsConfigured())
+                    if (handler.Name == "Steam")
                     {
-                        gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
-                    }
-                    else
-                    {
-                        logger.Warn($"No Steam config");
+                        int.TryParse(handler.Id, out int AppId);
+                        if (AppId != 0)
+                        {
+                            if (IsConfigured())
+                            {
+                                gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
+                            }
+                            else
+                            {
+                                logger.Warn($"No Steam config");
+                            }
+                        }
                     }
                 }
             }

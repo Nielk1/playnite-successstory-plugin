@@ -44,7 +44,7 @@ namespace SuccessStory.Views
         private SteamAchievements steamAchievements = new SteamAchievements();
         private ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
 
-        private Dictionary<AchievementSource, ISearchableManualAchievements> searchProviders;
+        private Dictionary<string, ISearchableManualAchievements> searchProviders;
         private List<AchievementProviderRadioButton> searchProviderButtons;
 
         public SuccessStoreGameSelection(Game game)
