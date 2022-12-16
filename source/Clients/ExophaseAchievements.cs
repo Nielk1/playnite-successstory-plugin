@@ -222,6 +222,17 @@ namespace SuccessStory.Clients
                     Name = "Exophase",
                     Url = searchResult.Url
                 };
+                try
+                {
+                    string str = searchResult?.Url
+                            ?.Replace("https://www.exophase.com/game/", string.Empty)
+                            ?.Replace("/achievements/", string.Empty);
+                    if (!string.IsNullOrWhiteSpace(str))
+                    {
+                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Exophase", str) };
+                    }
+                }
+                catch { }
             }
 
 
@@ -507,7 +518,7 @@ namespace SuccessStory.Clients
         {
             if (sourceName == "exophase")
             {
-                SetRarety(gameAchievements, AchievementSourceOld.Local);
+                //SetRarety(gameAchievements, gameAchievements.GetAssignedHandler());
             }
             return gameAchievements;
         }

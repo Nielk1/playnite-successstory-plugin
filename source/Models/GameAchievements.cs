@@ -14,8 +14,9 @@ namespace SuccessStory.Models
 {
     public class GameAchievements : PluginDataBaseGame<Achievements>
     {
-        private SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;
+        public HashSet<AchievementHandler> Handlers { get; set; }
 
+        private SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;
 
         private List<Achievements> _Items = new List<Achievements>();
         public override List<Achievements> Items { get => _Items; set => SetValue(ref _Items, value); }

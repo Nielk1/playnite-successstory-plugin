@@ -146,6 +146,7 @@ namespace SuccessStory.Clients
                     Name = "Battle.net",
                     Url = UrlProfil
                 };
+                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/StarCraft II", UserSc2Id) };
             }
 
 

@@ -122,12 +122,14 @@ namespace SuccessStory.Clients
             // Set source link
             if (gameAchievements.HasAchievements)
             {
+                string titleId = GetTitleId(game);
                 gameAchievements.SourcesLink = new SourceLink
                 {
                     GameName = game.Name,
                     Name = "Xbox",
-                    Url = $"https://account.xbox.com/en-US/GameInfoHub?titleid={GetTitleId(game)}&selectedTab=achievementsTab&activetab=main:mainTab2"
+                    Url = $"https://account.xbox.com/en-US/GameInfoHub?titleid={titleId}&selectedTab=achievementsTab&activetab=main:mainTab2"
                 };
+                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Xbox", titleId) };
             }
 
             // Set rarity from Exophase

@@ -136,6 +136,7 @@
     <Compile Include="Controls\AchievmentProviderRadioButton.xaml.cs">
       <DependentUpon>AchievmentProviderRadioButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Models\AchievementHandler.cs" />
     <Compile Include="Models\GenshinImpactAchievementsCategory.cs" />
     <Compile Include="Clients\GogAchievements.cs" />
     <Compile Include="Clients\OriginAchievements.cs" />

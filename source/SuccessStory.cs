@@ -29,6 +29,7 @@ using QuickSearch.SearchItems;
 using CommonPluginsStores.Steam;
 using SuccessStory.Clients;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using System.Net;
 
 namespace SuccessStory
 {
@@ -758,7 +759,6 @@ namespace SuccessStory
 
 
         #region Game event
-        // TODO: this function always uses steam manually to get achivement rates
         public override void OnGameSelected(OnGameSelectedEventArgs args)
         {
             // TODO Sourcelink - Removed for Playnite 11
@@ -809,6 +809,198 @@ namespace SuccessStory
                             else
                             {
                                 // TODO Refresh by user ?
+                            }
+
+                            PluginDatabase.AddOrUpdate(gameAchievements);
+                        }
+                        catch (Exception ex)
+                        {
+                            Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                        }
+                    }
+                }, globalProgressOptions);
+            }
+
+            // TODO AchievementHandler - Removed for Playnite 11
+            var handlerNull = PluginDatabase.Database?.Select(x => x)
+                                    .Where(x => x.Handlers == null
+                                       /*&& x.IsManual*/
+                                       && x.SourcesLink != null
+                                       && x.HasAchievements
+                                       && PlayniteApi.Database.Games.Get(x.Id) != null);
+            if (handlerNull?.Count() > 0)
+            {
+                GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
+                    $"{PluginDatabase.PluginName} - Database migration 2",
+                    false
+                );
+                globalProgressOptions.IsIndeterminate = true;
+
+                PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
+                {
+                    SteamApi steamApi = new SteamApi(PluginDatabase.PluginName);
+
+                    foreach (GameAchievements gameAchievements in handlerNull)
+                    {
+                        try
+                        {
+                            Game game = PlayniteApi.Database.Games.Get(gameAchievements.Id);
+                            if (game == null)
+                            {
+                                break;
+                            }
+
+                            string SourceName = PlayniteTools.GetSourceName(game);
+
+                            if (gameAchievements.SourcesLink != null)
+                            {
+                                switch (gameAchievements.SourcesLink.Name)
+                                {
+                                    case "Steam":
+                                        {
+                                            if (gameAchievements.IsManual)
+                                            {
+                                                string str = gameAchievements.SourcesLink?.Url
+                                                    .Replace("https://steamcommunity.com/stats/", string.Empty)
+                                                    .Replace("/achievements", string.Empty);
+                                                if (int.TryParse(str, out int AppId))
+                                                {
+                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
+                                                }
+                                            }
+                                            else
+                                            {
+                                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", game.GameId) };
+                                            }
+                                        }
+                                        break;
+                                    case "Epic":
+                                        if (!gameAchievements.IsManual)
+                                        {
+                                            try
+                                            {
+                                                string str = gameAchievements.SourcesLink?.Url
+                                                        ?.Replace("https://www.epicgames.com/store/", string.Empty)
+                                                        ?.Replace("/achievements", string.Empty)
+                                                        ?.Split('/')?[1];
+                                                if (!string.IsNullOrWhiteSpace(str))
+                                                {
+                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Epic", str) };
+                                                }
+                                            }
+                                            catch { }
+                                        }
+                                        break;
+                                    case "Exophase":
+                                        if (gameAchievements.IsManual)
+                                        {
+                                            try
+                                            {
+                                                string str = gameAchievements.SourcesLink?.Url
+                                                        ?.Replace("https://www.exophase.com/game/", string.Empty)
+                                                        ?.Replace("/achievements/", string.Empty);
+                                                if (!string.IsNullOrWhiteSpace(str))
+                                                {
+                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Exophase", str) };
+                                                }
+                                            }
+                                            catch { }
+                                        }
+                                        break;
+                                    case "EA":
+                                    case "Origin":
+                                        if (!gameAchievements.IsManual)
+                                        {
+                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("EA", game.GameId) };
+                                        }
+                                        break;
+                                    case "GOG":
+                                        if (!gameAchievements.IsManual)
+                                        {
+                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GOG", game.GameId) };
+                                        }
+                                        break;
+                                    case "Xbox":
+                                        {
+                                            try
+                                            {
+                                                string titleId = System.Web.HttpUtility.ParseQueryString(new Uri(gameAchievements.SourcesLink.Url).Query)["titleid"];
+                                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Xbox", titleId) };
+                                            }
+                                            catch { }
+                                        }
+                                        break;
+                                    case "PSN":
+                                        if (!gameAchievements.IsManual)
+                                        {
+                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("PSN", game.GameId) };
+                                        }
+                                        break;
+                                    case "RetroAchievements":
+                                        if (!gameAchievements.IsManual && gameAchievements.RAgameID > 0)
+                                        {
+                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString()) };
+                                        }
+                                        break;
+                                    case "Battle.net":
+                                        if (gameAchievements.Name == "Overwatch")
+                                        {
+                                            try
+                                            {
+                                                string str = gameAchievements.SourcesLink?.Url
+                                                    .Replace("https://playoverwatch.com/", string.Empty)
+                                                    .Split('/')[1];
+                                                if (!string.IsNullOrWhiteSpace(str))
+                                                {
+                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/Overwatch", str) };
+                                                }
+                                            }
+                                            catch { }
+                                        }
+                                        if (gameAchievements.Name == "StarCraft II")
+                                        {
+                                            try
+                                            {
+                                                string str = gameAchievements.SourcesLink?.Url;
+                                                if (!string.IsNullOrWhiteSpace(str))
+                                                {
+                                                    string UserSc2Id = str.Split('/').Last();
+                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/StarCraft II", UserSc2Id) };
+                                                }
+                                            }
+                                            catch { }
+                                        }
+                                        if (gameAchievements.Name == "Wow")
+                                        {
+                                            string region = PluginDatabase.PluginSettings.Settings.WowRegions.Find(x => x.IsSelected)?.Name;
+                                            string realm = PluginDatabase.PluginSettings.Settings.WowRealms.Find(x => x.IsSelected)?.Slug;
+                                            string character = PluginDatabase.PluginSettings.Settings.WowCharacter;
+                                            string UrlWowBaseLocalised = $"{region}/{realm}/{character}";
+                                            if (!string.IsNullOrWhiteSpace(UrlWowBaseLocalised))
+                                            {
+                                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/Wow", UrlWowBaseLocalised) };
+                                            }
+                                        }
+                                        break;
+                                    case "GitHub":
+                                        if (gameAchievements.SourcesLink.GameName == "Genshin Impact")
+                                        {
+                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GenshinImpact", null) };
+                                        }
+                                        break;
+                                    case "Guild Wars 2":
+                                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GuildWars2", null) };
+                                        break;
+                                    case "RPCS3":
+                                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RPCS3", null) };
+                                        break;
+                                    //case "xxxx":
+                                    //    gameAchievements.AchievementHandler = "True";
+                                    //    break;
+                                    default:
+                                        logger.Warn($"Data migration 2 failed for {game.Source} {game.GameId} {game.Id} {game.Name}");
+                                        break;
+                                }
                             }
 
                             PluginDatabase.AddOrUpdate(gameAchievements);

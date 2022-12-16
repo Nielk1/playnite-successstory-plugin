@@ -273,6 +273,7 @@ namespace SuccessStory.Clients
                                 Name = "Steam",
                                 Url = string.Format(UrlProfilById, SteamId, AppId, LocalLang)
                             };
+                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
                         }
                     }
                 }
@@ -331,6 +332,7 @@ namespace SuccessStory.Clients
                                     Name = "Steam",
                                     Url = $"https://steamcommunity.com/stats/{AppId}/achievements"
                                 };
+                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
                             }
                         }
                     }
@@ -430,6 +432,7 @@ namespace SuccessStory.Clients
                                     Name = "Steam",
                                     Url = $"https://steamcommunity.com/stats/{AppId}/achievements"
                                 };
+                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
                             }
                         }
                     }

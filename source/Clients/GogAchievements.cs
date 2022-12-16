@@ -93,6 +93,7 @@ namespace SuccessStory.Clients
                     if (gameAchievements.HasAchievements)
                     {
                         gameAchievements.SourcesLink = GogAPI.GetAchievementsSourceLink(game.Name, game.GameId, GogAPI.CurrentAccountInfos);
+                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GOG", game.GameId) };
                     }
                 }
                 catch (Exception ex)

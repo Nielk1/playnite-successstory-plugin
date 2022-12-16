@@ -137,6 +137,13 @@ namespace SuccessStory.Clients
                     Name = "Battle.net",
                     Url = UrlWowBaseLocalised
                 };
+                string region = PluginDatabase.PluginSettings.Settings.WowRegions.Find(x => x.IsSelected)?.Name;
+                string realm = PluginDatabase.PluginSettings.Settings.WowRealms.Find(x => x.IsSelected)?.Slug;
+                string character = PluginDatabase.PluginSettings.Settings.WowCharacter;
+                if (!string.IsNullOrWhiteSpace(UrlWowBaseLocalised))
+                {
+                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/Wow", $"{region}/{realm}/{character}") };
+                }
             }
 
             // Set rarity from Exophase

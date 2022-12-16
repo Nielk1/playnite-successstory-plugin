@@ -310,31 +310,7 @@ namespace SuccessStory.Services
 
             foreach (var provider in AchievementMetadataAugmenters)
             {
-                provider.Value.RefreshRarity(sourceName, gameAchievements);
-            }
-
-            switch (sourceName)
-            {
-                case "steam":
-                    int.TryParse(Regex.Match(gameAchievements.SourcesLink.Url, @"\d+").Value, out int AppId);
-                    if (AppId != 0)
-                    {
-                        if (steamAchievements.IsConfigured())
-                        {
-                            gameAchievements.Items = steamAchievements.GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
-                        }
-                        else
-                        {
-                            logger.Warn($"No Steam config");
-                        }
-                    }
-                    break;
-                case "exophase":
-                    exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Local);
-                    break;
-                default:
-                    logger.Warn($"No sourcesLink for {gameAchievements.Name}");
-                    break;
+                gameAchievements = provider.Value.RefreshRarity(sourceName, gameAchievements);
             }
 
             return gameAchievements;

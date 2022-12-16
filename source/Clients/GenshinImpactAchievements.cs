@@ -202,6 +202,7 @@ namespace SuccessStory.Clients
                         Name = "GitHub",
                         Url = "https://github.com/theBowja/GenshinData-1"
                     };
+                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GenshinImpact", null) };
                 });
             }
             catch (Exception ex)

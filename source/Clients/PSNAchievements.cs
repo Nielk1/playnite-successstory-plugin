@@ -208,6 +208,7 @@ namespace SuccessStory.Clients
                     Name = "PSN",
                     Url = Url
                 };
+                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("PSN", game.GameId) };
             }
 
             return gameAchievements;

@@ -35,6 +35,8 @@ namespace SuccessStory.Clients
                 switch (game.Name.ToLowerInvariant())
                 {
                     case "overwatch":
+                    //case "overwatch 2":
+                    //case "overwatch ii":
                         if (settings.EnableOverwatchAchievements)
                         {
                             return 200;

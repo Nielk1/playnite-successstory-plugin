@@ -92,6 +92,7 @@ namespace SuccessStory.Clients
                     if (gameAchievements.HasAchievements)
                     {
                         gameAchievements.SourcesLink = OriginAPI.GetAchievementsSourceLink(game.Name, gameInfos.Id, OriginAPI.CurrentAccountInfos);
+                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("EA", game.GameId) };
                     }
                 }
                 catch (Exception ex)

@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SuccessStory.Models
+{
+    public struct AchievementHandler
+    {
+        public string Name { get; set; }
+        public string Id { get; set; }
+        public AchievementHandler(string name, string id) : this()
+        {
+            this.Name = name;
+            this.Id = id;
+        }
+        /*public override int GetHashCode()
+        {
+            unchecked // disable overflow, for the unlikely possibility that you
+            {         // are compiling with overflow-checking enabled
+                int hash = 27;
+                hash = (13 * hash) + Name.GetHashCode();
+                hash = (13 * hash) + (Id ?? string.Empty).GetHashCode();
+                return hash;
+            }
+        }*/
+    }
+}

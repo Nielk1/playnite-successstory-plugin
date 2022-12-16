@@ -222,6 +222,7 @@ namespace SuccessStory.Clients
                     Name = "Guild Wars 2",
                     Url = "https://wiki.guildwars2.com/wiki/API:Main"
                 };
+                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GuildWars2", null) };
             }
 
             gameAchievements.Items = AllAchievements;

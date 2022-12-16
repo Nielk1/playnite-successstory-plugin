@@ -175,6 +175,7 @@ namespace SuccessStory.Clients
                     Name = "RetroAchievements",
                     Url = $"https://retroachievements.org/game/{gameAchievements.RAgameID}"
                 };
+                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString()) };
             }
 
             return gameAchievements;

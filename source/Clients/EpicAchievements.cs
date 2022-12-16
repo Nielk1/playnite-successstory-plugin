@@ -86,6 +86,18 @@ namespace SuccessStory.Clients
                     if (gameAchievements.HasAchievements)
                     {
                         gameAchievements.SourcesLink = EpicAPI.GetAchievementsSourceLink(game.Name, game.GameId, EpicAPI.CurrentAccountInfos);
+                        try
+                        {
+                            string str = gameAchievements.SourcesLink?.Url
+                                    ?.Replace("https://www.epicgames.com/store/", string.Empty)
+                                    ?.Replace("/achievements", string.Empty)
+                                    ?.Split('/')?[1];
+                            if (!string.IsNullOrWhiteSpace(str))
+                            {
+                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Epic", str) };
+                            }
+                        }
+                        catch { }
                     }
                 }
                 catch (Exception ex)

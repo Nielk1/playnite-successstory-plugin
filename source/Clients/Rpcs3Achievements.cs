@@ -170,6 +170,8 @@ namespace SuccessStory.Clients
 
                     AllAchievements.ForEach(x => gameAchievements.Items.Add(x));
                 }
+
+                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RPCS3", null) };
             }
             else
             {
