@@ -20,7 +20,7 @@ namespace SuccessStory.Clients
     }
     internal class WowAchievements : BattleNetAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.BattleNetLibrary)
             {
@@ -142,7 +142,7 @@ namespace SuccessStory.Clients
                 string character = PluginDatabase.PluginSettings.Settings.WowCharacter;
                 if (!string.IsNullOrWhiteSpace(UrlWowBaseLocalised))
                 {
-                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/Wow", $"{region}/{realm}/{character}") };
+                    gameAchievements.Handler = new MainAchievementHandler("Battle.net/Wow", $"{region}/{realm}/{character}");
                 }
             }
 

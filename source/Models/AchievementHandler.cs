@@ -6,24 +6,47 @@ using System.Threading.Tasks;
 
 namespace SuccessStory.Models
 {
-    public struct AchievementHandler
+    public class AchievementHandler
     {
         public string Name { get; set; }
         public string Id { get; set; }
-        public AchievementHandler(string name, string id) : this()
+        public Dictionary<string, DateTime> Updated { get; set; }
+        public AchievementHandler(string name, string id)
         {
             this.Name = name;
             this.Id = id;
         }
-        /*public override int GetHashCode()
+        //public override int GetHashCode()
+        //{
+        //    unchecked // disable overflow, for the unlikely possibility that you
+        //    {         // are compiling with overflow-checking enabled
+        //        int hash = 27;
+        //        hash = (13 * hash) + Name.GetHashCode();
+        //        hash = (13 * hash) + (Id ?? string.Empty).GetHashCode();
+        //        return hash;
+        //    }
+        //}
+    }
+    public class MainAchievementHandler
+    {
+        public string Name { get; set; }
+        public string Id { get; set; }
+        public DateTime Updated { get; set; }
+        public MainAchievementHandler(string name, string id)
         {
-            unchecked // disable overflow, for the unlikely possibility that you
-            {         // are compiling with overflow-checking enabled
-                int hash = 27;
-                hash = (13 * hash) + Name.GetHashCode();
-                hash = (13 * hash) + (Id ?? string.Empty).GetHashCode();
-                return hash;
-            }
-        }*/
+            this.Name = name;
+            this.Id = id;
+            this.Updated = DateTime.UtcNow;
+        }
+        //public override int GetHashCode()
+        //{
+        //    unchecked // disable overflow, for the unlikely possibility that you
+        //    {         // are compiling with overflow-checking enabled
+        //        int hash = 27;
+        //        hash = (13 * hash) + Name.GetHashCode();
+        //        hash = (13 * hash) + (Id ?? string.Empty).GetHashCode();
+        //        return hash;
+        //    }
+        //}
     }
 }

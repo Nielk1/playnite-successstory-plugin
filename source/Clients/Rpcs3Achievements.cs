@@ -23,7 +23,7 @@ namespace SuccessStory.Clients
     }
     class Rpcs3Achievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (game.GameActions != null)
             {
@@ -171,7 +171,7 @@ namespace SuccessStory.Clients
                     AllAchievements.ForEach(x => gameAchievements.Items.Add(x));
                 }
 
-                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RPCS3", null) };
+                gameAchievements.Handler = new MainAchievementHandler("RPCS3", null);
             }
             else
             {

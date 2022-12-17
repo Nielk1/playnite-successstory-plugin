@@ -14,7 +14,50 @@ namespace SuccessStory.Models
 {
     public class GameAchievements : PluginDataBaseGame<Achievements>
     {
-        public HashSet<AchievementHandler> Handlers { get; set; }
+        public MainAchievementHandler Handler { get; set; }
+        private object ExtraHandlersLock = new object();
+        public HashSet<AchievementHandler> ExtraHandlers { get; set; }
+        public void SetExtraHandlerDate(string name, string id, string field)
+        {
+            lock(ExtraHandlersLock)
+            {
+                if (ExtraHandlers == null)
+                    ExtraHandlers = new HashSet<AchievementHandler>();
+                AchievementHandler handler = ExtraHandlers.Where(dr => dr.Name == name && dr.Id == id).FirstOrDefault();
+                if (handler != null)
+                {
+                    handler.Id = id;
+                    if (field != null)
+                    {
+                        if (handler.Updated == null)
+                            handler.Updated = new Dictionary<string, DateTime>();
+                        handler.Updated[field] = DateTime.UtcNow;
+                    }
+                }
+                else
+                {
+                    handler = new AchievementHandler(name, id);
+                    if (field != null)
+                    {
+                        if (handler.Updated == null)
+                            handler.Updated = new Dictionary<string, DateTime>();
+                        handler.Updated[field] = DateTime.UtcNow;
+                    }
+                    ExtraHandlers.Add(handler);
+                }
+            }
+        }
+        public DateTime? GetExtraHandlerDate(string name, /*string id,*/ string field)
+        {
+            if (ExtraHandlers == null)
+                return null;
+            AchievementHandler handler = ExtraHandlers.Where(dr => dr.Name == name /*&& (id == null || dr.Id == id)*/).FirstOrDefault();
+            if (handler == null)
+                return null;
+            if (!handler.Updated.ContainsKey(field))
+                return null;
+            return handler.Updated[field];
+        }
 
         private SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;
 

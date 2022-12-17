@@ -14,6 +14,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
@@ -39,6 +40,7 @@ namespace SuccessStory.Clients
             ExophaseAchievements tmp = new ExophaseAchievements();
             Providers[AchievementSource.Exophase] = tmp;
             ManualSearchProviders[AchievementSource.Exophase] = tmp;
+            AchievementMetadataAugmenters[AchievementSource.Exophase] = tmp;
         }
     }
     class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements, IMetadataAugmentAchievements
@@ -229,7 +231,7 @@ namespace SuccessStory.Clients
                             ?.Replace("/achievements/", string.Empty);
                     if (!string.IsNullOrWhiteSpace(str))
                     {
-                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Exophase", str) };
+                        gameAchievements.Handler = new MainAchievementHandler("Exophase", str);
                     }
                 }
                 catch { }
@@ -301,7 +303,7 @@ namespace SuccessStory.Clients
 
 
 
-        private string GetAchievementsPageUrl(GameAchievements gameAchievements, AchievementHandler source)
+        private string GetAchievementsPageUrl(GameAchievements gameAchievements, MainAchievementHandler source)
         {
             bool UsedSplit = false;
 
@@ -348,50 +350,73 @@ namespace SuccessStory.Clients
         /// </summary>
         /// <param name="gameAchievements"></param>
         /// <param name="source"></param>
-        public void SetRarety(GameAchievements gameAchievements, AchievementHandler source)
+        public bool SetRarity(GameAchievements gameAchievements, MainAchievementHandler source)
         {
+            DateTime? lastUpdate = gameAchievements.GetExtraHandlerDate("Exophase", "Rarity");
+
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
             {
                 logger.Warn($"No Exophase (rarity) url find for {gameAchievements.Name} - {gameAchievements.Id}");
-                return;
+                return false;
             }
+
+            bool providerMatched = false;
 
             try
             {
-                GameAchievements exophaseAchievements = GetAchievementsInternal(
-                    PluginDatabase.PlayniteApi.Database.Games.Get(gameAchievements.Id),
-                    achievementsUrl
-                );
-
-                exophaseAchievements.Items.ForEach(y =>
+                string str = achievementsUrl
+                    ?.Replace("https://www.exophase.com/game/", string.Empty)
+                    ?.Replace("/achievements/", string.Empty);
+                if (!string.IsNullOrWhiteSpace(str))
                 {
-                    var achievement = gameAchievements.Items.Find(x => x.Name.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
-                    if (achievement == null)
-                    {
-                        achievement = gameAchievements.Items.Find(x => x.ApiName.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
-                    }
 
-                    if (achievement != null)
+                    //DateTime? lastUpdate = gameAchievements.GetExtraHandlerDate("Exophase", str, "Rarity");
+                    providerMatched = lastUpdate.HasValue; // if there's a date here, we know we've had this data before and thus we are the winner
+                    if ((lastUpdate ?? DateTime.MinValue) < DateTime.UtcNow.AddDays(-1))
                     {
-                        achievement.Percent = y.Percent;
-                    }
-                    else
-                    {
-                        logger.Warn($"No Exophase (rarity) matching achievements found for {gameAchievements.Name} - {gameAchievements.Id} - {y.Name} in {achievementsUrl}");
-                    }
-                });
 
-                PluginDatabase.AddOrUpdate(gameAchievements);
+                        GameAchievements exophaseAchievements = GetAchievementsInternal(
+                            PluginDatabase.PlayniteApi.Database.Games.Get(gameAchievements.Id),
+                            achievementsUrl
+                        );
+
+                        exophaseAchievements.Items.ForEach(y =>
+                        {
+                            var achievement = gameAchievements.Items.Find(x => x.Name.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
+                            if (achievement == null)
+                            {
+                                achievement = gameAchievements.Items.Find(x => x.ApiName.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
+                            }
+
+                            if (achievement != null)
+                            {
+                                achievement.Percent = y.Percent;
+                            }
+                            else
+                            {
+                                logger.Warn($"No Exophase (rarity) matching achievements found for {gameAchievements.Name} - {gameAchievements.Id} - {y.Name} in {achievementsUrl}");
+                            }
+                        });
+
+                        gameAchievements.SetExtraHandlerDate("Exophase", str, "Rarity");
+
+                        PluginDatabase.AddOrUpdate(gameAchievements);
+
+                        return true;
+                    }
+                }
             }
             catch (Exception ex)
             {
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
+
+            return providerMatched;
         }
 
 
-        public void SetMissingDescription(GameAchievements gameAchievements, AchievementHandler source)
+        public void SetMissingDescription(GameAchievements gameAchievements, MainAchievementHandler source)
         {
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
@@ -443,7 +468,7 @@ namespace SuccessStory.Clients
         /// <param name="playniteGame"></param>
         /// <param name="achievementSource"></param>
         /// <returns></returns>
-        private static bool PlatformAndProviderMatch(SearchResult exophaseGame, GameAchievements playniteGame, AchievementHandler achievementSource)
+        private static bool PlatformAndProviderMatch(SearchResult exophaseGame, GameAchievements playniteGame, MainAchievementHandler achievementSource)
         {
             switch (achievementSource.Name)
             {
@@ -514,18 +539,14 @@ namespace SuccessStory.Clients
 
 
 
-        public GameAchievements RefreshRarity(GameAchievements gameAchievements)
+        public bool RefreshRarity(GameAchievements gameAchievements)
         {
-            return gameAchievements;
+            return SetRarity(gameAchievements, gameAchievements.Handler);
+        }
 
-            if (gameAchievements.Handlers != null)
-            {
-                foreach (var handler in gameAchievements.Handlers)
-                {
-                    SetRarety(gameAchievements, handler);
-                }
-            }
-            return gameAchievements;
+        public int CheckAugmentAchivementSourceRank()
+        {
+            return 1;
         }
     }
 }

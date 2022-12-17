@@ -24,7 +24,7 @@ namespace SuccessStory.Clients
     }
     class GuildWars2Achievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (game.Name.IsEqual("Guild Wars 2"))
             {
@@ -222,7 +222,7 @@ namespace SuccessStory.Clients
                     Name = "Guild Wars 2",
                     Url = "https://wiki.guildwars2.com/wiki/API:Main"
                 };
-                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GuildWars2", null) };
+                gameAchievements.Handler = new MainAchievementHandler("GuildWars2", null);
             }
 
             gameAchievements.Items = AllAchievements;

@@ -25,9 +25,9 @@ namespace SuccessStory.Clients
     }
     class GenshinImpactAchievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
-            if (game.Name.IsEqual("Genshin Impact") && !ignoreSpecial)
+            if (game.Name.IsEqual("Genshin Impact"))
             {
                 return 200;
             }
@@ -204,7 +204,7 @@ namespace SuccessStory.Clients
                         Name = "GitHub",
                         Url = UrlSource
                     };
-                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GenshinImpact", null) };
+                    gameAchievements.Handler = new MainAchievementHandler("GenshinImpact", null);
                 });
             }
             catch (Exception ex)

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
+using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
@@ -26,44 +27,60 @@ namespace SuccessStory.Clients
     }
     class TrueAchievements : GenericAchievements, IMetadataAugmentAchievements
     {
-        public GameAchievements RefreshRarity(GameAchievements gameAchievements)
+        public bool RefreshRarity(GameAchievements gameAchievements)
         {
-            return gameAchievements;
+            return false;
         }
 
         public override bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
         {
-            bool updated = false;
+            DateTime? lastUpdateS = gameAchievements.GetExtraHandlerDate("TrueSteam", "Time");
+            DateTime? lastUpdateX = gameAchievements.GetExtraHandlerDate("TrueXbox", "Time");
+            bool providerMatched = lastUpdateS.HasValue || lastUpdateX.HasValue;
 
-            EstimateTimeToUnlock EstimateTimeSteam = new EstimateTimeToUnlock();
-            EstimateTimeToUnlock EstimateTimeXbox = new EstimateTimeToUnlock();
-
-            List<TrueAchievementSearch> ListGames = TrueAchievements.SearchGame(game, OriginData.Steam);
-            if (ListGames.Count > 0)
+            if ((lastUpdateS ?? lastUpdateX ?? DateTime.MinValue) < DateTime.UtcNow.AddDays(-1))
             {
-                EstimateTimeSteam = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+                EstimateTimeToUnlock EstimateTimeSteam = new EstimateTimeToUnlock();
+                EstimateTimeToUnlock EstimateTimeXbox = new EstimateTimeToUnlock();
+
+                string IdSteam = null;
+                string IdXbox = null;
+
+                List<TrueAchievementSearch> ListGames = TrueAchievements.SearchGame(game, OriginData.Steam);
+                if (ListGames.Count > 0)
+                {
+                    EstimateTimeSteam = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+                    IdSteam = ListGames[0].GameUrl
+                                          .Replace("https://truesteamachievements.com/game/", string.Empty)
+                                          .Replace("/achievements", string.Empty);
+                }
+
+                ListGames = TrueAchievements.SearchGame(game, OriginData.Xbox);
+                if (ListGames.Count > 0)
+                {
+                    EstimateTimeXbox = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
+                    IdXbox = ListGames[0].GameUrl
+                                         .Replace("https://www.trueachievements.com/game/", string.Empty)
+                                         .Replace("/achievements", string.Empty);
+                }
+
+                if (EstimateTimeSteam.DataCount >= EstimateTimeXbox.DataCount)
+                {
+                    Common.LogDebug(true, $"Get EstimateTimeSteam for {game.Name}");
+                    gameAchievements.EstimateTime = EstimateTimeSteam;
+                    providerMatched = true;
+                    gameAchievements.SetExtraHandlerDate("TrueSteam", IdSteam, "Time");
+                }
+                else
+                {
+                    Common.LogDebug(true, $"Get EstimateTimeXbox for {game.Name}");
+                    gameAchievements.EstimateTime = EstimateTimeXbox;
+                    providerMatched = true;
+                    gameAchievements.SetExtraHandlerDate("TrueXbox", IdXbox, "Time");
+                }
             }
 
-            ListGames = TrueAchievements.SearchGame(game, OriginData.Xbox);
-            if (ListGames.Count > 0)
-            {
-                EstimateTimeXbox = TrueAchievements.GetEstimateTimeToUnlock(ListGames[0].GameUrl);
-            }
-
-            if (EstimateTimeSteam.DataCount >= EstimateTimeXbox.DataCount)
-            {
-                Common.LogDebug(true, $"Get EstimateTimeSteam for {game.Name}");
-                gameAchievements.EstimateTime = EstimateTimeSteam;
-                updated = true;
-            }
-            else
-            {
-                Common.LogDebug(true, $"Get EstimateTimeXbox for {game.Name}");
-                gameAchievements.EstimateTime = EstimateTimeXbox;
-                updated = true;
-            }
-
-            return updated;
+            return providerMatched;
         }
         public override GameAchievements GetAchievements(Game game)
         {
@@ -291,6 +308,11 @@ namespace SuccessStory.Clients
             }
 
             return EstimateTimeToUnlock;
+        }
+
+        public int CheckAugmentAchivementSourceRank()
+        {
+            return 2;
         }
     }
 

@@ -22,7 +22,7 @@ namespace SuccessStory.Clients
     }
     class OriginAchievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.OriginLibrary && settings.EnableOrigin)
             {
@@ -92,7 +92,7 @@ namespace SuccessStory.Clients
                     if (gameAchievements.HasAchievements)
                     {
                         gameAchievements.SourcesLink = OriginAPI.GetAchievementsSourceLink(game.Name, gameInfos.Id, OriginAPI.CurrentAccountInfos);
-                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("EA", game.GameId) };
+                        gameAchievements.Handler = new MainAchievementHandler("EA", game.GameId);
                     }
                 }
                 catch (Exception ex)

@@ -36,13 +36,14 @@ namespace SuccessStory.Clients
     }
     interface IMetadataAugmentAchievements
     {
-        GameAchievements RefreshRarity(GameAchievements gameAchievements);
+        bool RefreshRarity(GameAchievements gameAchievements);
         bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements);
+        int CheckAugmentAchivementSourceRank();
     }
     public abstract class GenericAchievements
     {
         // TODO: make this function also detect if a specific provider is already attached, which is critical for manual achivements
-        public virtual int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public virtual int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             return 0;
         }

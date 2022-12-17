@@ -21,7 +21,7 @@ namespace SuccessStory.Clients
     }
     class GogAchievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.GogLibrary && settings.EnableGog)
             {
@@ -93,7 +93,7 @@ namespace SuccessStory.Clients
                     if (gameAchievements.HasAchievements)
                     {
                         gameAchievements.SourcesLink = GogAPI.GetAchievementsSourceLink(game.Name, game.GameId, GogAPI.CurrentAccountInfos);
-                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GOG", game.GameId) };
+                        gameAchievements.Handler = new MainAchievementHandler("GOG", game.GameId);
                     }
                 }
                 catch (Exception ex)

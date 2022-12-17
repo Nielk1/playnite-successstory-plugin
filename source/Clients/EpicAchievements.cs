@@ -16,7 +16,7 @@ namespace SuccessStory.Clients
 {
     class EpicAchievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.EpicLibrary && settings.EnableEpic)
             {
@@ -94,7 +94,7 @@ namespace SuccessStory.Clients
                                     ?.Split('/')?[1];
                             if (!string.IsNullOrWhiteSpace(str))
                             {
-                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Epic", str) };
+                                gameAchievements.Handler = new MainAchievementHandler("Epic", str);
                             }
                         }
                         catch { }

@@ -34,6 +34,7 @@ namespace SuccessStory.Clients
             SteamAchievements tmp = new SteamAchievements();
             Providers[AchievementSource.Steam] = tmp;
             ManualSearchProviders[AchievementSource.Steam] = tmp;
+            AchievementMetadataAugmenters[AchievementSource.Steam] = tmp;
         }
     }
     /*class LocalAchievements : SteamAchievements
@@ -42,7 +43,7 @@ namespace SuccessStory.Clients
         {
             SetLocal();
         }
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (settings.EnableLocal)
             {
@@ -195,7 +196,7 @@ namespace SuccessStory.Clients
         #endregion
 
 
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.SteamLibrary && settings.EnableSteam)
             {
@@ -273,7 +274,7 @@ namespace SuccessStory.Clients
                                 Name = "Steam",
                                 Url = string.Format(UrlProfilById, SteamId, AppId, LocalLang)
                             };
-                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
+                            gameAchievements.Handler = new MainAchievementHandler("Steam", AppId.ToString());
                         }
                     }
                 }
@@ -332,7 +333,7 @@ namespace SuccessStory.Clients
                                     Name = "Steam",
                                     Url = $"https://steamcommunity.com/stats/{AppId}/achievements"
                                 };
-                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
+                                gameAchievements.Handler = new MainAchievementHandler("Steam", AppId.ToString());
                             }
                         }
                     }
@@ -432,7 +433,7 @@ namespace SuccessStory.Clients
                                     Name = "Steam",
                                     Url = $"https://steamcommunity.com/stats/{AppId}/achievements"
                                 };
-                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
+                                gameAchievements.Handler = new MainAchievementHandler("Steam", AppId.ToString());
                             }
                         }
                     }
@@ -1577,30 +1578,41 @@ namespace SuccessStory.Clients
 
 
 
-        public GameAchievements RefreshRarity(GameAchievements gameAchievements)
+        public bool RefreshRarity(GameAchievements gameAchievements)
         {
-            if (gameAchievements.Handlers != null)
+            bool providerMatched = false;
+
+            // path for if handler is already Steam
+            if (gameAchievements.Handler.Name == "Steam")
             {
-                foreach (var handler in gameAchievements.Handlers)
+                int.TryParse(gameAchievements.Handler.Id, out int AppId);
+                if (AppId != 0)
                 {
-                    if (handler.Name == "Steam")
+                    DateTime? lastUpdate = gameAchievements.GetExtraHandlerDate("Steam", "Rarity");
+                    providerMatched = lastUpdate.HasValue; // if there's a date here, we know we've had this data before and thus we are the winner
+                    if (IsConfigured())
                     {
-                        int.TryParse(handler.Id, out int AppId);
-                        if (AppId != 0)
+                        if ((lastUpdate ?? DateTime.MinValue) < DateTime.UtcNow.AddDays(-1))
                         {
-                            if (IsConfigured())
-                            {
-                                gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
-                            }
-                            else
-                            {
-                                logger.Warn($"No Steam config");
-                            }
+                            gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
+                            gameAchievements.SetExtraHandlerDate("Steam", AppId.ToString(), "Rarity");
+
+                            PluginDatabase.AddOrUpdate(gameAchievements);
+
+                            providerMatched = true;
                         }
+                    }
+                    else
+                    {
+                        logger.Warn($"No Steam config");
                     }
                 }
             }
-            return gameAchievements;
+            return providerMatched;
+        }
+        public int CheckAugmentAchivementSourceRank()
+        {
+            return 2;
         }
     }
 }

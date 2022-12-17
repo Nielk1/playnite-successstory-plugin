@@ -43,7 +43,7 @@ namespace SuccessStory.Clients
     }
     class RetroAchievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (game.GameActions != null)
             {
@@ -175,7 +175,7 @@ namespace SuccessStory.Clients
                     Name = "RetroAchievements",
                     Url = $"https://retroachievements.org/game/{gameAchievements.RAgameID}"
                 };
-                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString()) };
+                gameAchievements.Handler = new MainAchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString());
             }
 
             return gameAchievements;

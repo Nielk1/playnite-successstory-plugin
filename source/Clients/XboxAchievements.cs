@@ -28,7 +28,7 @@ namespace SuccessStory.Clients
     }
     class XboxAchievements : GenericAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.None)
             {
@@ -129,7 +129,7 @@ namespace SuccessStory.Clients
                     Name = "Xbox",
                     Url = $"https://account.xbox.com/en-US/GameInfoHub?titleid={titleId}&selectedTab=achievementsTab&activetab=main:mainTab2"
                 };
-                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Xbox", titleId) };
+                gameAchievements.Handler = new MainAchievementHandler("Xbox", titleId);
             }
 
             // Set rarity from Exophase

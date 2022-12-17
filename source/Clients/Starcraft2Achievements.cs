@@ -25,7 +25,7 @@ namespace SuccessStory.Clients
     }
     internal class Starcraft2Achievements : BattleNetAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.BattleNetLibrary)
             {
@@ -146,7 +146,7 @@ namespace SuccessStory.Clients
                     Name = "Battle.net",
                     Url = UrlProfil
                 };
-                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/StarCraft II", UserSc2Id) };
+                gameAchievements.Handler = new MainAchievementHandler("Battle.net/StarCraft II", UserSc2Id);
             }
 
 

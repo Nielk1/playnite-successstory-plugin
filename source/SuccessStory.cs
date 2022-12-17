@@ -823,7 +823,7 @@ namespace SuccessStory
 
             // TODO AchievementHandler - Removed for Playnite 11
             var handlerNull = PluginDatabase.Database?.Select(x => x)
-                                    .Where(x => x.Handlers == null
+                                    .Where(x => x.Handler == null
                                        /*&& x.IsManual*/
                                        && x.SourcesLink != null
                                        && x.HasAchievements
@@ -865,12 +865,12 @@ namespace SuccessStory
                                                     .Replace("/achievements", string.Empty);
                                                 if (int.TryParse(str, out int AppId))
                                                 {
-                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", AppId.ToString()) };
+                                                    gameAchievements.Handler = new MainAchievementHandler("Steam", AppId.ToString());
                                                 }
                                             }
                                             else
                                             {
-                                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Steam", game.GameId) };
+                                                gameAchievements.Handler = new MainAchievementHandler("Steam", game.GameId);
                                             }
                                         }
                                         break;
@@ -885,7 +885,7 @@ namespace SuccessStory
                                                         ?.Split('/')?[1];
                                                 if (!string.IsNullOrWhiteSpace(str))
                                                 {
-                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Epic", str) };
+                                                    gameAchievements.Handler = new MainAchievementHandler("Epic", str);
                                                 }
                                             }
                                             catch { }
@@ -901,7 +901,7 @@ namespace SuccessStory
                                                         ?.Replace("/achievements/", string.Empty);
                                                 if (!string.IsNullOrWhiteSpace(str))
                                                 {
-                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Exophase", str) };
+                                                    gameAchievements.Handler = new MainAchievementHandler("Exophase", str);
                                                 }
                                             }
                                             catch { }
@@ -911,13 +911,13 @@ namespace SuccessStory
                                     case "Origin":
                                         if (!gameAchievements.IsManual)
                                         {
-                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("EA", game.GameId) };
+                                            gameAchievements.Handler = new MainAchievementHandler("EA", game.GameId);
                                         }
                                         break;
                                     case "GOG":
                                         if (!gameAchievements.IsManual)
                                         {
-                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GOG", game.GameId) };
+                                            gameAchievements.Handler = new MainAchievementHandler("GOG", game.GameId);
                                         }
                                         break;
                                     case "Xbox":
@@ -925,7 +925,7 @@ namespace SuccessStory
                                             try
                                             {
                                                 string titleId = System.Web.HttpUtility.ParseQueryString(new Uri(gameAchievements.SourcesLink.Url).Query)["titleid"];
-                                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Xbox", titleId) };
+                                                gameAchievements.Handler = new MainAchievementHandler("Xbox", titleId);
                                             }
                                             catch { }
                                         }
@@ -933,13 +933,13 @@ namespace SuccessStory
                                     case "PSN":
                                         if (!gameAchievements.IsManual)
                                         {
-                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("PSN", game.GameId) };
+                                            gameAchievements.Handler = new MainAchievementHandler("PSN", game.GameId);
                                         }
                                         break;
                                     case "RetroAchievements":
                                         if (!gameAchievements.IsManual && gameAchievements.RAgameID > 0)
                                         {
-                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString()) };
+                                            gameAchievements.Handler = new MainAchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString());
                                         }
                                         break;
                                     case "Battle.net":
@@ -952,7 +952,7 @@ namespace SuccessStory
                                                     .Split('/')[1];
                                                 if (!string.IsNullOrWhiteSpace(str))
                                                 {
-                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/Overwatch", str) };
+                                                    gameAchievements.Handler = new MainAchievementHandler("Battle.net/Overwatch", str);
                                                 }
                                             }
                                             catch { }
@@ -965,7 +965,7 @@ namespace SuccessStory
                                                 if (!string.IsNullOrWhiteSpace(str))
                                                 {
                                                     string UserSc2Id = str.Split('/').Last();
-                                                    gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/StarCraft II", UserSc2Id) };
+                                                    gameAchievements.Handler = new MainAchievementHandler("Battle.net/StarCraft II", UserSc2Id);
                                                 }
                                             }
                                             catch { }
@@ -978,21 +978,21 @@ namespace SuccessStory
                                             string UrlWowBaseLocalised = $"{region}/{realm}/{character}";
                                             if (!string.IsNullOrWhiteSpace(UrlWowBaseLocalised))
                                             {
-                                                gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("Battle.net/Wow", UrlWowBaseLocalised) };
+                                                gameAchievements.Handler = new MainAchievementHandler("Battle.net/Wow", UrlWowBaseLocalised);
                                             }
                                         }
                                         break;
                                     case "GitHub":
                                         if (gameAchievements.SourcesLink.GameName == "Genshin Impact")
                                         {
-                                            gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GenshinImpact", null) };
+                                            gameAchievements.Handler = new MainAchievementHandler("GenshinImpact", null);
                                         }
                                         break;
                                     case "Guild Wars 2":
-                                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("GuildWars2", null) };
+                                        gameAchievements.Handler = new MainAchievementHandler("GuildWars2", null);
                                         break;
                                     case "RPCS3":
-                                        gameAchievements.Handlers = new HashSet<AchievementHandler>() { new AchievementHandler("RPCS3", null) };
+                                        gameAchievements.Handler = new MainAchievementHandler("RPCS3", null);
                                         break;
                                     //case "xxxx":
                                     //    gameAchievements.AchievementHandler = "True";

@@ -230,7 +230,7 @@ namespace SuccessStory.Services
         {
             Game game = PlayniteApi.Database.Games.Get(Id);
             GameAchievements gameAchievements = GetDefault(game);
-            GenericAchievements achievementProvider = GetAchievementSource(PluginSettings.Settings, game, true);
+            GenericAchievements achievementProvider = GetAchievementSource(PluginSettings.Settings, game);
 
             if (achievementProvider != null)
             {
@@ -286,12 +286,6 @@ namespace SuccessStory.Services
                 Common.LogDebug(true, $"VerifToAddOrShow({game.Name}, {achievementProvider.GetType()}) - No Achievement Client fits constraints");
             }
 
-            // TODO: metadata update here for rarity
-            gameAchievements = RefreshRarity(gameAchievements);
-            gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
-
-            // TODO: do we need an AddOrUpdate here?
-
             if (!(gameAchievements?.HasAchievements ?? false))
             {
                 logger.Info($"No achievements find for {game.Name} - {game.Id}");
@@ -299,6 +293,11 @@ namespace SuccessStory.Services
             else
             {
                 logger.Info($"Find {gameAchievements.Total} achievements find for {game.Name} - {game.Id}");
+
+                // TODO: metadata update here for rarity
+                gameAchievements = RefreshRarity(gameAchievements);
+                gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
+                // TODO: do we need an AddOrUpdate here?
             }
 
             return gameAchievements;
@@ -306,9 +305,10 @@ namespace SuccessStory.Services
 
         private GameAchievements RefreshRarity(GameAchievements gameAchievements)
         {
-            foreach (var provider in AchievementMetadataAugmenters)
+            foreach (var provider in AchievementMetadataAugmenters.OrderByDescending(dr => dr.Value.CheckAugmentAchivementSourceRank()))
             {
-                gameAchievements = provider.Value.RefreshRarity(gameAchievements);
+                if (provider.Value.RefreshRarity(gameAchievements))
+                    break;
             }
 
             return gameAchievements;
@@ -818,7 +818,7 @@ namespace SuccessStory.Services
         /// <param name="game"></param>
         /// <param name="ignoreSpecial"></param>
         /// <returns></returns>
-        public static GenericAchievements GetAchievementSource(SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public static GenericAchievements GetAchievementSource(SuccessStorySettings settings, Game game)
         {
             ExternalPlugin pluginType = PlayniteTools.GetPluginType(game.PluginId);
             return AchievementProviders
@@ -1005,6 +1005,7 @@ namespace SuccessStory.Services
                     {
                         if (VerifToAddOrShow)
                         {
+                            // TODO: Add refresh for manual in that it will add new achivements to the list if needed
                             if (!gameAchievements.IsManual)
                             {
                                 RefreshNoLoader(Id);

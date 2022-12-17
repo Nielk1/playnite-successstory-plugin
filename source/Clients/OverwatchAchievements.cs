@@ -28,7 +28,7 @@ namespace SuccessStory.Clients
     }
     internal class OverwatchAchievements : BattleNetAchievements
     {
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game, bool ignoreSpecial = false)
+        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.BattleNetLibrary)
             {
