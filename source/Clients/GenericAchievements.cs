@@ -27,23 +27,48 @@ namespace SuccessStory.Clients
     }
     interface ISearchableManualAchievements
     {
+        /// <summary>
+        /// ClientName is from the base class, but we also need it here so we know what to display in the manual search list.
+        /// </summary>
         string ClientName { get; }
+        /// <summary>
+        /// Text character to use for manual search button, consider a way to non-font list this.
+        /// </summary>
         string Glyph { get; }
-        List<SearchResult> SearchGame(string Name);
+        /// <summary>
+        /// This acheivement provider can be used for manual mode games.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="gameAchievements"></param>
+        /// <returns></returns>
         bool CanDoManualAchievements(Game game, GameAchievements gameAchievements);
-        GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements);
+        /// <summary>
+        /// Search for games using this string search, used to apply acheivements to a manual mode games.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <returns></returns>
+        List<SearchResult> SearchGame(string Name);
+        /// <summary>
+        /// Get achievements from a search result from SearchGame, used when applying manual acheivements for first time.
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="searchResult"></param>
+        /// <returns></returns>
         GameAchievements GetManualAchievements(Game game, SearchResult searchResult);
+        /// <summary>
+        /// Refresh manual achievements, used to attach initial achievements. TODO: make this apply also when refreshing manual
+        /// </summary>
+        /// <param name="game"></param>
+        /// <param name="gameAchievements"></param>
+        /// <returns></returns>
+        GameAchievements DoManualAchievements(Game game, GameAchievements gameAchievements);
     }
     interface IMetadataAugmentAchievements
     {
-        // There is a dedicated function for refreshing achievement rarity for manual games, so we need this function call
-        //bool RefreshRarity(GameAchievements gameAchievements);
-        // There is a dedicated function for refreshing achievement time estimates for manual games, so we need this function call
-        //bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements);
-        //int CheckAugmentAchievementSourceRank();
-        int CheckAugmentAchievementSourceRank(string augmenter);
-        string[] GetAugmentAchievementTypes();
-        bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements);
+        string[] GetAugmentTypes();
+        string[] GetAugmentTypesManual();
+        int GetAugmenterRank(string augmenter);
+        bool RefreshAugmenterMetadata(string augmenter, GameAchievements gameAchievements);
     }
     public abstract class GenericAchievements
     {

@@ -8,12 +8,10 @@ namespace SuccessStory.Models
 {
     public class AchievementHandler
     {
-        public string Name { get; set; }
         public string Id { get; set; }
         public Dictionary<string, DateTime> Updated { get; set; }
-        public AchievementHandler(string name, string id)
+        public AchievementHandler(string id)
         {
-            this.Name = name;
             this.Id = id;
         }
         //public override int GetHashCode()

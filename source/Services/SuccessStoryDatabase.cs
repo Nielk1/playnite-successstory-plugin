@@ -308,7 +308,7 @@ namespace SuccessStory.Services
             HashSet<string> MetadataAugmenterTypes = new HashSet<string>();
             foreach (var augmenters in AchievementMetadataAugmenters)
             {
-                string[] types = augmenters.Value.GetAugmentAchievementTypes();
+                string[] types = augmenters.Value.GetAugmentTypes();
                 if (types != null)
                 {
                     foreach (var type in types)
@@ -324,9 +324,9 @@ namespace SuccessStory.Services
         }
         private void RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
         {
-            foreach (var provider in AchievementMetadataAugmenters.Where(dr => dr.Value.GetAugmentAchievementTypes()?.Contains(augmenter) ?? false).OrderByDescending(dr => dr.Value.CheckAugmentAchievementSourceRank(augmenter)))
+            foreach (var provider in AchievementMetadataAugmenters.Where(dr => dr.Value.GetAugmentTypes()?.Contains(augmenter) ?? false).OrderByDescending(dr => dr.Value.GetAugmenterRank(augmenter)))
             {
-                if (provider.Value.RefreshAugmentedMetadata(augmenter, gameAchievements))
+                if (provider.Value.RefreshAugmenterMetadata(augmenter, gameAchievements))
                 {
                     break;
                 }

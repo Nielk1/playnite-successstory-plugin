@@ -1593,7 +1593,7 @@ namespace SuccessStory.Clients
             return providerMatched;
         }
 
-        public int CheckAugmentAchievementSourceRank(string augmenter)
+        public int GetAugmenterRank(string augmenter)
         {
             switch (augmenter)
             {
@@ -1602,9 +1602,10 @@ namespace SuccessStory.Clients
             }
             return 0;
         }
-        public string[] GetAugmentAchievementTypes() => new string[] { "Rarity" };
+        public string[] GetAugmentTypes() => new string[] { "Rarity" };
+        public string[] GetAugmentTypesManual() => GetAugmentTypes();
 
-        public bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
+        public bool RefreshAugmenterMetadata(string augmenter, GameAchievements gameAchievements)
         {
             switch (augmenter)
             {

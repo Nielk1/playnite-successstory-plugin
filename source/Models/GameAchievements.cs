@@ -16,47 +16,37 @@ namespace SuccessStory.Models
     {
         public MainAchievementHandler Handler { get; set; }
         private object ExtraHandlersLock = new object();
-        public HashSet<AchievementHandler> ExtraHandlers { get; set; }
+        public Dictionary<string, AchievementHandler> ExtraHandlers { get; set; }
         public void SetExtraHandlerDate(string name, string id, string field)
         {
-            lock(ExtraHandlersLock)
+            lock (ExtraHandlersLock)
             {
                 if (ExtraHandlers == null)
-                    ExtraHandlers = new HashSet<AchievementHandler>();
-                AchievementHandler handler = ExtraHandlers.Where(dr => dr.Name == name && dr.Id == id).FirstOrDefault();
-                if (handler != null)
+                    ExtraHandlers = new Dictionary<string, AchievementHandler>();
+                if (!ExtraHandlers.ContainsKey(name))
                 {
-                    handler.Id = id;
-                    if (field != null)
-                    {
-                        if (handler.Updated == null)
-                            handler.Updated = new Dictionary<string, DateTime>();
-                        handler.Updated[field] = DateTime.UtcNow;
-                    }
+                    ExtraHandlers[name] = new AchievementHandler(id);
                 }
-                else
+                if (field != null)
                 {
-                    handler = new AchievementHandler(name, id);
-                    if (field != null)
-                    {
-                        if (handler.Updated == null)
-                            handler.Updated = new Dictionary<string, DateTime>();
-                        handler.Updated[field] = DateTime.UtcNow;
-                    }
-                    ExtraHandlers.Add(handler);
+                    if (ExtraHandlers[name].Updated == null)
+                        ExtraHandlers[name].Updated = new Dictionary<string, DateTime>();
+                    ExtraHandlers[name].Updated[field] = DateTime.UtcNow;
                 }
             }
         }
-        public DateTime? GetExtraHandlerDate(string name, /*string id,*/ string field)
+        public DateTime? GetExtraHandlerDate(string name, string field)
         {
-            if (ExtraHandlers == null)
-                return null;
-            AchievementHandler handler = ExtraHandlers.Where(dr => dr.Name == name /*&& (id == null || dr.Id == id)*/).FirstOrDefault();
-            if (handler == null)
-                return null;
-            if (!handler.Updated.ContainsKey(field))
-                return null;
-            return handler.Updated[field];
+            lock (ExtraHandlersLock)
+            {
+                if (ExtraHandlers == null)
+                    return null;
+                if (!ExtraHandlers.ContainsKey(name))
+                    return null;
+                if (!ExtraHandlers[name].Updated.ContainsKey(field))
+                    return null;
+                return ExtraHandlers[name].Updated[field];
+            }
         }
 
         private SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;

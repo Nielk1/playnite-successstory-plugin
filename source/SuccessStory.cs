@@ -701,7 +701,7 @@ namespace SuccessStory
                 HashSet<string> MetadataAugmenterTypes = new HashSet<string>();
                 foreach (var augmenters in AchievementMetadataAugmenters)
                 {
-                    string[] types = augmenters.Value.GetAugmentAchievementTypes();
+                    string[] types = augmenters.Value.GetAugmentTypesManual();
                     if (types != null)
                     {
                         foreach (var type in types)

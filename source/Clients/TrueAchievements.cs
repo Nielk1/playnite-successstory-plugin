@@ -310,7 +310,7 @@ namespace SuccessStory.Clients
             return EstimateTimeToUnlock;
         }
 
-        public int CheckAugmentAchievementSourceRank(string augmenter)
+        public int GetAugmenterRank(string augmenter)
         {
             switch (augmenter)
             {
@@ -319,9 +319,10 @@ namespace SuccessStory.Clients
             }
             return 0;
         }
-        public string[] GetAugmentAchievementTypes() => new string[] { "Time" };
+        public string[] GetAugmentTypes() => new string[] { "Time" };
+        public string[] GetAugmentTypesManual() => GetAugmentTypes();
 
-        public bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
+        public bool RefreshAugmenterMetadata(string augmenter, GameAchievements gameAchievements)
         {
             switch (augmenter)
             {
