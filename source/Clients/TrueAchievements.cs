@@ -310,9 +310,28 @@ namespace SuccessStory.Clients
             return EstimateTimeToUnlock;
         }
 
-        public int CheckAugmentAchivementSourceRank()
+        public int CheckAugmentAchievementSourceRank(string augmenter)
         {
-            return 2;
+            switch (augmenter)
+            {
+                case "Time":
+                    return 2;
+            }
+            return 0;
+        }
+        public string[] GetAugmentAchievementTypes() => new string[] { "Time" };
+
+        public bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
+        {
+            switch (augmenter)
+            {
+                case "Time":
+                    {
+                        Game game = PluginDatabase.PlayniteApi.Database.Games.Get(gameAchievements.Id);
+                        return SetEstimateTimeToUnlock(game, gameAchievements);
+                    }
+            }
+            return false;
         }
     }
 

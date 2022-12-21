@@ -679,7 +679,8 @@ namespace SuccessStory
                     Description = resources.GetString("LOCSsRefreshRaretyManual"),
                     Action = (mainMenuItem) =>
                     {
-                        PluginDatabase.RefreshRaretyForAllManualOnly();
+                        //PluginDatabase.RefreshRaretyForAllManualOnly();
+                        PluginDatabase.RefreshAugmentedMetadata("Rarity");
                     }
                 });
 
@@ -690,9 +691,40 @@ namespace SuccessStory
                     Description = resources.GetString("LOCSsRefreshEstimateTimeManual"),
                     Action = (mainMenuItem) =>
                     {
-                        PluginDatabase.RefreshEstimateTime();
+                        //PluginDatabase.RefreshEstimateTime();
+                        PluginDatabase.RefreshAugmentedMetadata("Time");
                     }
                 });
+
+                // Add menu items for the other metadata types, create synthetic LOC strings for now
+                // TODO: stop using synthetic LOC strings because in future these providers might come from another plugin
+                HashSet<string> MetadataAugmenterTypes = new HashSet<string>();
+                foreach (var augmenters in AchievementMetadataAugmenters)
+                {
+                    string[] types = augmenters.Value.GetAugmentAchievementTypes();
+                    if (types != null)
+                    {
+                        foreach (var type in types)
+                        {
+                            if (type != "Rarity" && type != "Time")
+                            {
+                                MetadataAugmenterTypes.Add(type);
+                            }
+                        }
+                    }
+                }
+                foreach (var augmenter in MetadataAugmenterTypes)
+                {
+                    mainMenuItems.Add(new MainMenuItem
+                    {
+                        MenuSection = MenuInExtensions + resources.GetString("LOCSuccessStory"),
+                        Description = resources.GetString($"LOCSsRefresh{augmenter}Manual"),
+                        Action = (mainMenuItem) =>
+                        {
+                            PluginDatabase.RefreshAugmentedMetadata(augmenter);
+                        }
+                    });
+                }
             }
 
             if (PluginDatabase.PluginSettings.Settings.EnableTag)

@@ -36,9 +36,14 @@ namespace SuccessStory.Clients
     }
     interface IMetadataAugmentAchievements
     {
-        bool RefreshRarity(GameAchievements gameAchievements);
-        bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements);
-        int CheckAugmentAchivementSourceRank();
+        // There is a dedicated function for refreshing achievement rarity for manual games, so we need this function call
+        //bool RefreshRarity(GameAchievements gameAchievements);
+        // There is a dedicated function for refreshing achievement time estimates for manual games, so we need this function call
+        //bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements);
+        //int CheckAugmentAchievementSourceRank();
+        int CheckAugmentAchievementSourceRank(string augmenter);
+        string[] GetAugmentAchievementTypes();
+        bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements);
     }
     public abstract class GenericAchievements
     {

@@ -50,7 +50,7 @@ namespace SuccessStory.Clients
         private readonly string UrlExophaseLogin = $"{UrlExophase}/login";
         private readonly string UrlExophaseLogout = $"{UrlExophase}/logout";
         private readonly string UrlExophaseAccount = $"{UrlExophase}/account";
-        
+
         public ExophaseAchievements() : base("Exophase")
         {
 
@@ -260,7 +260,7 @@ namespace SuccessStory.Clients
         public override bool EnabledInSettings()
         {
             // No necessary activation
-            return true; 
+            return true;
         }
         #endregion
 
@@ -311,7 +311,7 @@ namespace SuccessStory.Clients
             if (sourceLinkName == "Exophase")
             {
                 return gameAchievements.SourcesLink.Url;
-            }                
+            }
 
             var searchResults = SearchGame(gameAchievements.Name);
             if (searchResults.Count == 0)
@@ -329,8 +329,8 @@ namespace SuccessStory.Clients
                     {
                         logger.Warn($"No game found for {Regex.Match(gameAchievements.Name, @"^.*(?=[:-])").Value} in GetAchievementsPageUrl()");
                         return null;
-                    }                    
-                }                    
+                    }
+                }
             }
 
             string normalizedGameName = UsedSplit ? PlayniteTools.NormalizeGameName(Regex.Match(gameAchievements.Name, @"^.*(?=[:-])").Value) : PlayniteTools.NormalizeGameName(gameAchievements.Name);
@@ -432,7 +432,7 @@ namespace SuccessStory.Clients
                     achievementsUrl
                 );
 
-                exophaseAchievements.Items.ForEach(y => 
+                exophaseAchievements.Items.ForEach(y =>
                 {
                     var achievement = gameAchievements.Items.Find(x => x.Name.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
                     if (achievement == null)
@@ -544,9 +544,25 @@ namespace SuccessStory.Clients
             return SetRarity(gameAchievements, gameAchievements.Handler);
         }
 
-        public int CheckAugmentAchivementSourceRank()
+        public int CheckAugmentAchievementSourceRank(string augmenter)
         {
-            return 1;
+            switch (augmenter)
+            {
+                case "Rarity":
+                    return 1;
+            }
+            return 0;
+        }
+        public string[] GetAugmentAchievementTypes() => new string[] { "Rarity" };
+
+        public bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
+        {
+            switch (augmenter)
+            {
+                case "Rarity":
+                    return RefreshRarity(gameAchievements);
+            }
+            return false;
         }
     }
 }

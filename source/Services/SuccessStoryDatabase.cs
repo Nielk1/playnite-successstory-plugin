@@ -154,7 +154,7 @@ namespace SuccessStory.Services
                     gameAchievements.IsManual = true;
                 }
 
-                gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
+                RefreshAugmentedMetadata(gameAchievements);
                 AddOrUpdate(gameAchievements);
 
                 Common.LogDebug(true, $"GetManual({game.Id.ToString()}) - gameAchievements: {Serialization.ToJson(gameAchievements)}");
@@ -165,7 +165,6 @@ namespace SuccessStory.Services
             }
         }
 
-        // TODO: tight coupling of manual refresh
         public GameAchievements RefreshManual(Game game)
         {
             logger.Info($"RefreshManual({game?.Name} - {game?.Id})");
@@ -295,17 +294,47 @@ namespace SuccessStory.Services
                 logger.Info($"Find {gameAchievements.Total} achievements find for {game.Name} - {game.Id}");
 
                 // TODO: metadata update here for rarity
-                gameAchievements = RefreshRarity(gameAchievements);
-                gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
+                //gameAchievements = RefreshRarity(gameAchievements);
+                //gameAchievements = SetEstimateTimeToUnlock(game, gameAchievements);
+                RefreshAugmentedMetadata(gameAchievements);
                 // TODO: do we need an AddOrUpdate here?
             }
 
             return gameAchievements;
         }
 
-        private GameAchievements RefreshRarity(GameAchievements gameAchievements)
+        private void RefreshAugmentedMetadata(GameAchievements gameAchievements)
         {
-            foreach (var provider in AchievementMetadataAugmenters.OrderByDescending(dr => dr.Value.CheckAugmentAchivementSourceRank()))
+            HashSet<string> MetadataAugmenterTypes = new HashSet<string>();
+            foreach (var augmenters in AchievementMetadataAugmenters)
+            {
+                string[] types = augmenters.Value.GetAugmentAchievementTypes();
+                if (types != null)
+                {
+                    foreach (var type in types)
+                    {
+                        MetadataAugmenterTypes.Add(type);
+                    }
+                }
+            }
+            foreach (var augmenter in MetadataAugmenterTypes)
+            {
+                RefreshAugmentedMetadata(augmenter, gameAchievements);
+            }
+        }
+        private void RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
+        {
+            foreach (var provider in AchievementMetadataAugmenters.Where(dr => dr.Value.GetAugmentAchievementTypes()?.Contains(augmenter) ?? false).OrderByDescending(dr => dr.Value.CheckAugmentAchievementSourceRank(augmenter)))
+            {
+                if (provider.Value.RefreshAugmentedMetadata(augmenter, gameAchievements))
+                {
+                    break;
+                }
+            }
+        }
+        /*private GameAchievements RefreshRarity(GameAchievements gameAchievements)
+        {
+            foreach (var provider in AchievementMetadataAugmenters.OrderByDescending(dr => dr.Value.CheckAugmentAchievementSourceRank()))
             {
                 if (provider.Value.RefreshRarity(gameAchievements))
                     break;
@@ -336,7 +365,7 @@ namespace SuccessStory.Services
             }
 
             return gameAchievements;
-        }
+        }*/
 
 
         /// <summary>
@@ -932,7 +961,8 @@ namespace SuccessStory.Services
                 if (webItem != null)
                 {
                     webItem.IsManual = true;
-                    webItem = SetEstimateTimeToUnlock(game, webItem);
+                    //webItem = SetEstimateTimeToUnlock(game, webItem);
+                    RefreshAugmentedMetadata(webItem);
                     for (int i = 0; i < webItem.Items.Count; i++)
                     {
                         Achievements finded = loadedItem.Items.Find(x => (x.ApiName.IsNullOrEmpty() ? true : x.ApiName.IsEqual(webItem.Items[i].ApiName)) && x.Name.IsEqual(webItem.Items[i].Name));
@@ -958,7 +988,8 @@ namespace SuccessStory.Services
             {
                 if (webItem.HasAchievements)
                 {
-                    webItem = SetEstimateTimeToUnlock(game, webItem);
+                    //webItem = SetEstimateTimeToUnlock(game, webItem);
+                    RefreshAugmentedMetadata(webItem);
                 }
                 Update(webItem);
             }
@@ -1039,9 +1070,7 @@ namespace SuccessStory.Services
             }
         }
 
-        // TODO: tight coupling here between steam and exophase, purpose of this code yet unknown
-        // note this only refreshes manual games as that is what it's triggered on
-        public void RefreshRaretyForAllManualOnly()
+        public void RefreshAugmentedMetadata(string augmenter)
         {
             GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
                 $"{PluginName} - {resources.GetString("LOCCommonProcessing")}",
@@ -1058,97 +1087,30 @@ namespace SuccessStory.Services
                 activateGlobalProgress.ProgressMaxValue = (double)db.Count();
                 string CancelText = string.Empty;
 
-                //ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                //SteamAchievements steamAchievements = new SteamAchievements();
-                //bool SteamConfig = steamAchievements.IsConfigured();
-
                 foreach (GameAchievements gameAchievements in db)
                 {
-                    logger.Info($"RefreshRarety({gameAchievements.Name})");
+                    logger.Info($"RefreshAugmentedMetadata(\"{augmenter}\", {gameAchievements.Name})");
+
                     if (activateGlobalProgress.CancelToken.IsCancellationRequested)
                     {
                         CancelText = " canceled";
                         break;
                     }
 
-                    /*string SourceName = gameAchievements.SourcesLink?.Name?.ToLower();
-                    switch (SourceName)
-                    {
-                        case "steam":
-                            int.TryParse(Regex.Match(gameAchievements.SourcesLink.Url, @"\d+").Value, out int AppId);
-                            if (AppId != 0)
-                            {
-                                if (SteamConfig)
-                                {
-                                    gameAchievements.Items = steamAchievements.GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
-                                }
-                                else
-                                {
-                                    logger.Warn($"No Steam config");
-                                }
-                            }
-                            break;
-                        case "exophase":
-                            exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Local);
-                            break;
-                        default:
-                            logger.Warn($"No sourcesLink for {gameAchievements.Name}");
-                            break;
-                    }*/
-                    RefreshRarity(gameAchievements);
+                    //Game game = PlayniteApi.Database.Games.Get(gameAchievements.Id);
+                    //GameAchievements gameAchievementsNew = Serialization.GetClone(gameAchievements);
+                    //gameAchievementsNew = SetEstimateTimeToUnlock(game, gameAchievements);
+                    //AddOrUpdate(gameAchievementsNew);
 
+                    RefreshAugmentedMetadata(augmenter, gameAchievements);
                     AddOrUpdate(gameAchievements);
-                    activateGlobalProgress.CurrentProgressValue++;
-                }
-
-                stopWatch.Stop();
-                TimeSpan ts = stopWatch.Elapsed;
-                logger.Info($"Task RefreshRarety(){CancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {activateGlobalProgress.CurrentProgressValue}/{(double)db.Count()} items");
-            }, globalProgressOptions);
-        }
-
-        public void RefreshEstimateTime()
-        {
-            GlobalProgressOptions globalProgressOptions = new GlobalProgressOptions(
-                $"{PluginName} - {resources.GetString("LOCCommonProcessing")}",
-                true
-            );
-            globalProgressOptions.IsIndeterminate = false;
-
-            PlayniteApi.Dialogs.ActivateGlobalProgress((activateGlobalProgress) =>
-            {
-                Stopwatch stopWatch = new Stopwatch();
-                stopWatch.Start();
-
-                IEnumerable<GameAchievements> db = Database.Where(x => x.IsManual && x.HasAchievements);
-                activateGlobalProgress.ProgressMaxValue = (double)db.Count();
-                string CancelText = string.Empty;
-
-                ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                SteamAchievements steamAchievements = new SteamAchievements();
-                bool SteamConfig = steamAchievements.IsConfigured();
-
-                foreach (GameAchievements gameAchievements in db)
-                {
-                    logger.Info($"RefreshEstimateTime({gameAchievements.Name})");
-
-                    if (activateGlobalProgress.CancelToken.IsCancellationRequested)
-                    {
-                        CancelText = " canceled";
-                        break;
-                    }
-
-                    Game game = PlayniteApi.Database.Games.Get(gameAchievements.Id);
-                    GameAchievements gameAchievementsNew = Serialization.GetClone(gameAchievements);
-                    gameAchievementsNew = SetEstimateTimeToUnlock(game, gameAchievements);
-                    AddOrUpdate(gameAchievementsNew);
 
                     activateGlobalProgress.CurrentProgressValue++;
                 }
 
                 stopWatch.Stop();
                 TimeSpan ts = stopWatch.Elapsed;
-                logger.Info($"Task RefreshEstimateTime(){CancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {activateGlobalProgress.CurrentProgressValue}/{(double)db.Count()} items");
+                logger.Info($"Task RefreshAugmentedMetadata(\"{augmenter}\"){CancelText} - {string.Format("{0:00}:{1:00}.{2:00}", ts.Minutes, ts.Seconds, ts.Milliseconds / 10)} for {activateGlobalProgress.CurrentProgressValue}/{(double)db.Count()} items");
             }, globalProgressOptions);
         }
 

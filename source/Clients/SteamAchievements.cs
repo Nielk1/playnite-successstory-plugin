@@ -37,21 +37,6 @@ namespace SuccessStory.Clients
             AchievementMetadataAugmenters[AchievementSource.Steam] = tmp;
         }
     }
-    /*class LocalAchievements : SteamAchievements
-    {
-        public LocalAchievements()
-        {
-            SetLocal();
-        }
-        public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
-        {
-            if (settings.EnableLocal)
-            {
-                return 1;
-            }
-            return 0;
-        }
-    }*/
     class SteamAchievements : GenericAchievements, ISearchableManualAchievements, IMetadataAugmentAchievements
     {
         protected static SteamApi _steamApi;
@@ -70,9 +55,6 @@ namespace SuccessStory.Clients
         }
 
         private IHtmlDocument HtmlDocument { get; set; } = null;
-
-        //protected bool IsLocal { get; set; } = false;
-        //private bool IsManual { get; set; } = false;
  
         private static string SteamId { get; set; } = string.Empty;
         private static string SteamApiKey { get; set; } = string.Empty;
@@ -1610,9 +1592,26 @@ namespace SuccessStory.Clients
             }
             return providerMatched;
         }
-        public int CheckAugmentAchivementSourceRank()
+
+        public int CheckAugmentAchievementSourceRank(string augmenter)
         {
-            return 2;
+            switch (augmenter)
+            {
+                case "Rarity":
+                    return 2;
+            }
+            return 0;
+        }
+        public string[] GetAugmentAchievementTypes() => new string[] { "Rarity" };
+
+        public bool RefreshAugmentedMetadata(string augmenter, GameAchievements gameAchievements)
+        {
+            switch (augmenter)
+            {
+                case "Rarity":
+                    return RefreshRarity(gameAchievements);
+            }
+            return false;
         }
     }
 }
