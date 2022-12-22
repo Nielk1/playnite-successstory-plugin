@@ -29,7 +29,7 @@ namespace SuccessStory.Services
     {
         public SuccessStory Plugin;
 
-        private bool _isRetroachievements { get; set; }
+        //private bool _isRetroachievements { get; set; }
 
         private static Dictionary<string, GenericAchievements> _achievementProviders { get; set; }
         private static Dictionary<string, ISearchableManualAchievements> _achievementManualSearchProviders { get; set; }
@@ -373,7 +373,7 @@ namespace SuccessStory.Services
         /// </summary>
         /// <param name="GameID"></param>
         /// <returns></returns>
-        public AchievementsGraphicsDataCount GetCountByMonth(Guid? GameID = null, int limit = 11)
+        public AchievementsGraphicsDataCount GetCountByMonth(bool _isRetroachievements, Guid? GameID = null, int limit = 11)
         {
             string[] GraphicsAchievementsLabels = new string[limit + 1];
             ChartValues<CustomerForSingle> SourceAchievementsSeries = new ChartValues<CustomerForSingle>();
@@ -396,7 +396,9 @@ namespace SuccessStory.Services
                 try
                 {
                     bool ShowHidden = PluginSettings.Settings.IncludeHiddenGames;
-                    var db = Database.Items.Where(x => x.Value.HasAchievements && !x.Value.IsDeleted && (ShowHidden ? true : x.Value.Hidden == false)).ToList();
+                    var db = Database.Items.Where(x => x.Value.HasAchievements && !x.Value.IsDeleted && (ShowHidden ? true : x.Value.Hidden == false)
+                     && (PluginSettings.Settings.EnableRetroAchievementsView ? (_isRetroachievements ? PlayniteTools.IsGameEmulated(x.Value.Game) : !PlayniteTools.IsGameEmulated(x.Value.Game)) : true)
+                    ).ToList();
                     foreach (var item in db)
                     {
                         List<Achievements> temp = item.Value.Items;
@@ -472,7 +474,7 @@ namespace SuccessStory.Services
         }
 
         // TODO: more tight coupling here
-        public AchievementsGraphicsDataCountSources GetCountBySources()
+        public AchievementsGraphicsDataCountSources GetCountBySources(bool _isRetroachievements)
         {
             List<string> tempSourcesLabels = new List<string>();
             IEnumerable<KeyValuePair<Guid, GameAchievements>> db = Database.Items.Where(x => x.Value.IsManual);
@@ -622,7 +624,9 @@ namespace SuccessStory.Services
             }
 
             bool ShowHidden = PluginSettings.Settings.IncludeHiddenGames;
-            db = Database.Items.Where(x => x.Value.HasAchievements && !x.Value.IsDeleted && (ShowHidden ? true : x.Value.Hidden == false)).ToList();
+            db = Database.Items.Where(x => x.Value.HasAchievements && !x.Value.IsDeleted && (ShowHidden ? true : x.Value.Hidden == false)
+                     && (PluginSettings.Settings.EnableRetroAchievementsView ? (_isRetroachievements ? PlayniteTools.IsGameEmulated(x.Value.Game) : !PlayniteTools.IsGameEmulated(x.Value.Game)) : true)
+            ).ToList();
             foreach (KeyValuePair<Guid, GameAchievements> item in db)
             {
                 try

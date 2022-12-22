@@ -43,10 +43,13 @@ namespace SuccessStory
 
         private static Filters filters = null;
 
+        private bool isRetroAchievements;
 
         public SuccessView(bool isRetroAchievements = false, Game GameSelected = null)
         {
             InitializeComponent();
+
+            this.isRetroAchievements = isRetroAchievements;
 
             successViewData.Settings = PluginDatabase.PluginSettings.Settings;
             DataContext = successViewData;
@@ -109,7 +112,7 @@ namespace SuccessStory
                 ProgressionGlobal = PluginDatabase.Progession();
                 ProgressionLaunched = PluginDatabase.ProgessionLaunched();
 
-                GraphicsData = PluginDatabase.GetCountByMonth(null, 12);
+                GraphicsData = PluginDatabase.GetCountByMonth(isRetroAchievements, null, 12);
                 StatsGraphicsAchievementsLabels = GraphicsData.Labels;
 
 
@@ -370,7 +373,7 @@ namespace SuccessStory
 
         private void SetGraphicsAchievementsSources()
         {
-            var data = PluginDatabase.GetCountBySources();
+            var data = PluginDatabase.GetCountBySources(isRetroAchievements);
 
             this.Dispatcher.BeginInvoke((Action)delegate
             {
@@ -423,7 +426,9 @@ namespace SuccessStory
 
 
                 ListGames = PluginDatabase.Database
-                    .Where(x => x.HasAchievements && !x.IsDeleted && (ShowHidden ? true : x.Hidden == false))
+                    .Where(x => x.HasAchievements && !x.IsDeleted && (ShowHidden ? true : x.Hidden == false)
+                     && (PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView ? (isRetroAchievements ? PlayniteTools.IsGameEmulated(x.Game) : !PlayniteTools.IsGameEmulated(x.Game)) : true)
+                    )
                     .Select(x => new ListViewGames
                     {
                         GoToGame = GoToGame,
@@ -464,7 +469,9 @@ namespace SuccessStory
                 string pluginFolder = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
 
                 ObservableCollection<ListAll> ListAll = new ObservableCollection<ListAll>();
-                PluginDatabase.Database.Where(x => x.HasAchievements && !x.IsDeleted)
+                PluginDatabase.Database.Where(x => x.HasAchievements && !x.IsDeleted
+                     && (PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView ? (isRetroAchievements ? PlayniteTools.IsGameEmulated(x.Game) : !PlayniteTools.IsGameEmulated(x.Game)) : true)
+                    )
                         .ForEach(x =>
                         {
                             x.Items.Where(y => y.IsUnlock).ForEach(y => 

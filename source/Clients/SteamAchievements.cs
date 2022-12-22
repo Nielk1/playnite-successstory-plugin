@@ -1564,7 +1564,7 @@ namespace SuccessStory.Clients
         {
             bool providerMatched = false;
 
-            // path for if handler is already Steam
+            // path for if handler is already Steam, as we don't use Steam for rarity unless our primary is already Steam
             if (gameAchievements.Handler.Name == "Steam")
             {
                 int.TryParse(gameAchievements.Handler.Id, out int AppId);
