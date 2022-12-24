@@ -117,18 +117,9 @@ namespace SuccessStory
 
 
                 string icon = string.Empty;
-
                 if (PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements)
                 {
-                    if (isRetroAchievements)
-                    {
-                        if (PluginDatabase.PluginSettings.Settings.EnableRetroAchievements)
-                        {
-                            icon = TransformIcon.Get("RetroAchievements") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "RetroAchievements", SourceNameShort = "RetroAchievements", IsCheck = false });
-                        }
-                    }
-                    else
+                    if (!isRetroAchievements)
                     {
                         if (PluginDatabase.PluginSettings.Settings.EnableLocal)
                         {
@@ -137,41 +128,6 @@ namespace SuccessStory
 
                             icon = TransformIcon.Get("Hacked") + " ";
                             FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Hacked", SourceNameShort = "Hacked", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnableSteam)
-                        {
-                            icon = TransformIcon.Get("Steam") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Steam", SourceNameShort = "Steam", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnableGog)
-                        {
-                            icon = TransformIcon.Get("GOG") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "GOG", SourceNameShort = "GOG", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnableEpic)
-                        {
-                            icon = TransformIcon.Get("Epic") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Epic", SourceNameShort = "Epic", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnableOrigin)
-                        {
-                            icon = TransformIcon.Get("EA app") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "EA app", SourceNameShort = "EA app", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnableXbox)
-                        {
-                            icon = TransformIcon.Get("Xbox") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Xbox", SourceNameShort = "Xbox", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnableRpcs3Achievements)
-                        {
-                            icon = TransformIcon.Get("Rpcs3") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Rpcs3", SourceNameShort = "Rpcs3", IsCheck = false });
-                        }
-                        if (PluginDatabase.PluginSettings.Settings.EnablePsn)
-                        {
-                            icon = TransformIcon.Get("Playstation") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Playstation", SourceNameShort = "Playstation", IsCheck = false });
                         }
                         if (PluginDatabase.PluginSettings.Settings.EnableManual)
                         {
@@ -190,11 +146,6 @@ namespace SuccessStory
                                         }
                                     });
                         }
-                        if (PluginDatabase.PluginSettings.Settings.EnableOverwatchAchievements || PluginDatabase.PluginSettings.Settings.EnableSc2Achievements)
-                        {
-                            icon = TransformIcon.Get("Battle.net") + " ";
-                            FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Battle.net", SourceNameShort = "Battle.net", IsCheck = false });
-                        }
                     }
                 }
                 else
@@ -206,46 +157,6 @@ namespace SuccessStory
 
                         icon = TransformIcon.Get("Hacked") + " ";
                         FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Hacked", SourceNameShort = "Hacked", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableSteam)
-                    {
-                        icon = TransformIcon.Get("Steam") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Steam", SourceNameShort = "Steam", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableGog)
-                    {
-                        icon = TransformIcon.Get("GOG") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "GOG", SourceNameShort = "GOG", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableEpic)
-                    {
-                        icon = TransformIcon.Get("Epic") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Epic", SourceNameShort = "Epic", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableOrigin)
-                    {
-                        icon = TransformIcon.Get("EA") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Electronic Arts", SourceNameShort = "EA", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableXbox)
-                    {
-                        icon = TransformIcon.Get("Xbox") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Xbox", SourceNameShort = "Xbox", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableRetroAchievements)
-                    {
-                        icon = TransformIcon.Get("RetroAchievements") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "RetroAchievements", SourceNameShort = "RetroAchievements", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnableRpcs3Achievements)
-                    {
-                        icon = TransformIcon.Get("RPCS3") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "RPCS3", SourceNameShort = "Rpcs3", IsCheck = false });
-                    }
-                    if (PluginDatabase.PluginSettings.Settings.EnablePsn)
-                    {
-                        icon = TransformIcon.Get("Playstation") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Playstation", SourceNameShort = "Playstation", IsCheck = false });
                     }
                     if (PluginDatabase.PluginSettings.Settings.EnableManual)
                     {
@@ -264,11 +175,10 @@ namespace SuccessStory
                                     }
                                 });
                     }
-                    if (PluginDatabase.PluginSettings.Settings.EnableOverwatchAchievements || PluginDatabase.PluginSettings.Settings.EnableSc2Achievements)
-                    {
-                        icon = TransformIcon.Get("Battle.net") + " ";
-                        FilterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Battle.net", SourceNameShort = "Battle.net", IsCheck = false });
-                    }
+                }
+                foreach (var provider in SuccessStoryDatabase.AchievementProviders)
+                {
+                    provider.Value.GetFilterItems(isRetroAchievements, FilterSourceItems);
                 }
             })
             .ContinueWith(antecedent =>

@@ -13,6 +13,7 @@ using SteamKit2;
 using SuccessStory.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -67,6 +68,21 @@ namespace SuccessStory.Clients
         private static string UrlAchievements   => @"https://steamcommunity.com/stats/{0}/achievements/?l={1}";
 
         private static string UrlSearch         => @"https://store.steampowered.com/search/?term={0}";
+
+
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
+
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnableSteam)
+                {
+                    string icon = TransformIcon.Get("Steam") + " ";
+                    filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Steam", SourceNameShort = "Steam", IsCheck = false });
+                }
+            }
+        }
 
 
         public SteamAchievements() : base("Steam", CodeLang.GetSteamLang(PluginDatabase.PlayniteApi.ApplicationSettings.Language))

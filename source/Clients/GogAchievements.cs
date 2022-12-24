@@ -31,7 +31,19 @@ namespace SuccessStory.Clients
         }
 
 
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
 
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnableGog)
+                {
+                    string icon = TransformIcon.Get("GOG") + " ";
+                    filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "GOG", SourceNameShort = "GOG", IsCheck = false });
+                }
+            }
+        }
 
 
 

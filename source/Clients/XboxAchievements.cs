@@ -16,6 +16,7 @@ using CommonPlayniteShared.PluginLibrary.XboxLibrary;
 using CommonPluginsShared.Extensions;
 using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using System.Collections.ObjectModel;
 
 namespace SuccessStory.Clients
 {
@@ -54,6 +55,19 @@ namespace SuccessStory.Clients
 
 
 
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
+
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnableXbox)
+                {
+                    string icon = TransformIcon.Get("Xbox") + " ";
+                    filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Xbox", SourceNameShort = "Xbox", IsCheck = false });
+                }
+            }
+        }
 
 
 

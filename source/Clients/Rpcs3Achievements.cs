@@ -11,6 +11,7 @@ using CommonPluginsShared.Extensions;
 using Playnite.SDK;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using static CommonPluginsShared.PlayniteTools;
+using System.Collections.ObjectModel;
 
 namespace SuccessStory.Clients
 {
@@ -53,6 +54,20 @@ namespace SuccessStory.Clients
         }
 
 
+
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
+
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnableRpcs3Achievements)
+                {
+                    string icon = TransformIcon.Get("RPCS3") + " ";
+                    filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "RPCS3", SourceNameShort = "Rpcs3", IsCheck = false });
+                }
+            }
+        }
 
 
         public Rpcs3Achievements() : base("RPCS3")

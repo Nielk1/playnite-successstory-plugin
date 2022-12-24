@@ -14,6 +14,7 @@ using CommonPlayniteShared.Common;
 using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using Playnite.SDK.Plugins;
+using System.Collections.ObjectModel;
 
 namespace SuccessStory.Clients
 {
@@ -101,6 +102,10 @@ namespace SuccessStory.Clients
 
 
 
+        public virtual void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        { }
+
+
 
 
         internal static ILogger logger => LogManager.GetLogger();
@@ -118,6 +123,7 @@ namespace SuccessStory.Clients
         protected string LocalLangShort { get; }
 
         protected string LastErrorId { get; set; }
+
         protected string LastErrorMessage { get; set; }
 
         internal string cookiesPath { get; }

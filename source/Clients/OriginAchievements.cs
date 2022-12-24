@@ -32,6 +32,22 @@ namespace SuccessStory.Clients
         }
 
 
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
+
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnableOrigin)
+                {
+                    //string icon = TransformIcon.Get("EA app") + " ";
+                    //filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "EA app", SourceNameShort = "EA app", IsCheck = false });
+
+                    string icon = TransformIcon.Get("EA") + " ";
+                    filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Electronic Arts", SourceNameShort = "EA", IsCheck = false });
+                }
+            }
+        }
 
 
         protected static OriginApi _OriginAPI;

@@ -2,6 +2,8 @@
 using CommonPluginsShared;
 using Playnite.SDK.Data;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace SuccessStory.Clients
 {
@@ -9,6 +11,32 @@ namespace SuccessStory.Clients
     {
         protected string UrlOauth2      => @"https://account.blizzard.com:443/oauth2/authorization/account-settings";
         protected string UrlApiStatus   => @"https://account.blizzard.com/api/";
+
+
+
+
+
+
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
+
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnableOverwatchAchievements || PluginDatabase.PluginSettings.Settings.EnableSc2Achievements)
+                {
+                    if (!filterSourceItems.Any(dr => dr.SourceNameShort == "Battle.net"))
+                    {
+                        string icon = TransformIcon.Get("Battle.net") + " ";
+                        filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Battle.net", SourceNameShort = "Battle.net", IsCheck = false });
+                    }
+                }
+            }
+        }
+
+
+
+
 
 
         public BattleNetAchievements(string ClientName, string LocalLang = "", string LocalLangShort = "") : base(ClientName, LocalLang, LocalLangShort)

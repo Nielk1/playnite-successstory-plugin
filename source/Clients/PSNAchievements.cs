@@ -13,6 +13,7 @@ using CommonPluginsShared.Extensions;
 using CommonPlayniteShared.PluginLibrary.PSNLibrary.Models;
 using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using System.Collections.ObjectModel;
 
 namespace SuccessStory.Clients
 {
@@ -34,6 +35,24 @@ namespace SuccessStory.Clients
             }
             return 0;
         }
+
+
+
+
+        public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
+        {
+            bool retroAchievementsEnabled = PluginDatabase.PluginSettings.Settings.EnableRetroAchievementsView && PluginDatabase.PluginSettings.Settings.EnableRetroAchievements;
+
+            if ((retroAchievementsEnabled && !isRetroAchievements) || !retroAchievementsEnabled)
+            {
+                if (PluginDatabase.PluginSettings.Settings.EnablePsn)
+                {
+                    string icon = TransformIcon.Get("Playstation") + " ";
+                    filterSourceItems.Add(new ListSource { SourceName = ((icon.Length == 2) ? icon : string.Empty) + "Playstation", SourceNameShort = "Playstation", IsCheck = false });
+                }
+            }
+        }
+
 
 
 
