@@ -127,29 +127,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Clients\BattleNetAchievements.cs" />
-    <Compile Include="Clients\EpicAchievements.cs" />
-    <Compile Include="Clients\ExophaseAchievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\BattleNetAchievements.cs" />
+    <Compile Include="Providers\Epic\Clients\EpicAchievements.cs" />
+    <Compile Include="Providers\Exophase\Clients\ExophaseAchievements.cs" />
     <Compile Include="Clients\GenericAchievements.cs" />
-    <Compile Include="Clients\GenshinImpactAchievements.cs" />
-    <Compile Include="Clients\GuildWars2Achievements.cs" />
+    <Compile Include="Providers\GenshinImpact\Clients\GenshinImpactAchievements.cs" />
+    <Compile Include="Providers\GuildWars2\Clients\GuildWars2Achievements.cs" />
     <Compile Include="Controls\AchievmentProviderRadioButton.xaml.cs">
       <DependentUpon>AchievmentProviderRadioButton.xaml</DependentUpon>
     </Compile>
     <Compile Include="Models\AchievementHandler.cs" />
-    <Compile Include="Models\GenshinImpactAchievementsCategory.cs" />
-    <Compile Include="Clients\GogAchievements.cs" />
-    <Compile Include="Clients\OriginAchievements.cs" />
-    <Compile Include="Clients\OverwatchAchievements.cs" />
-    <Compile Include="Clients\PSNAchievements.cs" />
-    <Compile Include="Clients\RetroAchievements.cs" />
-    <Compile Include="Clients\Rpcs3Achievements.cs" />
-    <Compile Include="Clients\Starcraft2Achievements.cs" />
-    <Compile Include="Clients\SteamAchievements.cs" />
-    <Compile Include="Clients\SteamEmulators.cs" />
-    <Compile Include="Clients\TrueAchievements.cs" />
-    <Compile Include="Clients\WowAchievements.cs" />
-    <Compile Include="Clients\XboxAchievements.cs" />
+    <Compile Include="Providers\GenshinImpact\Models\GenshinImpactAchievementsCategory.cs" />
+    <Compile Include="Providers\GOG\Clients\GogAchievements.cs" />
+    <Compile Include="Providers\EA\Clients\OriginAchievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\OverwatchAchievements.cs" />
+    <Compile Include="Providers\PSN\Clients\PSNAchievements.cs" />
+    <Compile Include="Providers\RetroAchievements\Clients\RetroAchievements.cs" />
+    <Compile Include="Providers\RPCS3\Clients\Rpcs3Achievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\Starcraft2Achievements.cs" />
+    <Compile Include="Providers\Steam\Clients\SteamAchievements.cs" />
+    <Compile Include="Providers\Steam\Clients\SteamEmulators.cs" />
+    <Compile Include="Providers\TrueAchievements\Clients\TrueAchievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\WowAchievements.cs" />
+    <Compile Include="Providers\Xbox\Clients\XboxAchievements.cs" />
     <Compile Include="Controls\Customs\AchievementImage.xaml.cs">
       <DependentUpon>AchievementImage.xaml</DependentUpon>
     </Compile>
@@ -181,27 +181,27 @@
     <Compile Include="Converters\SetColorConverter.cs" />
     <Compile Include="Models\Achievements.cs" />
     <Compile Include="Models\AchRaretyStats.cs" />
-    <Compile Include="Models\BattleNetSc2Ach.cs" />
-    <Compile Include="Models\BattleNetSc2Profil.cs" />
-    <Compile Include="Models\ExophaseSearchResult.cs" />
+    <Compile Include="Providers\BattleNet\Models\BattleNetSc2Ach.cs" />
+    <Compile Include="Providers\BattleNet\Models\BattleNetSc2Profil.cs" />
+    <Compile Include="Providers\Exophase\Models\ExophaseSearchResult.cs" />
     <Compile Include="Models\GameStats.cs" />
-    <Compile Include="Models\GenshinImpactAchievementData.cs" />
-    <Compile Include="Models\GW2Achievements.cs" />
-    <Compile Include="Models\GW2AchievementsGroups.cs" />
-    <Compile Include="Models\GW2OwnedAchievements.cs" />
+    <Compile Include="Providers\GenshinImpact\Models\GenshinImpactAchievementData.cs" />
+    <Compile Include="Providers\GuildWars2\Models\GW2Achievements.cs" />
+    <Compile Include="Providers\GuildWars2\Models\GW2AchievementsGroups.cs" />
+    <Compile Include="Providers\GuildWars2\Models\GW2OwnedAchievements.cs" />
     <Compile Include="Models\ListAchievements.cs" />
     <Compile Include="Models\ListAll.cs" />
     <Compile Include="Models\ListGames.cs" />
     <Compile Include="Models\ProgressionAchievements.cs" />
     <Compile Include="Models\GameAchievements.cs" />
-    <Compile Include="Models\PSN_NPWR_LIST.cs" />
+    <Compile Include="Providers\PSN\Models\PSN_NPWR_LIST.cs" />
     <Compile Include="Models\QuickSearchItemSource.cs" />
     <Compile Include="Models\RaConsoleAssociated.cs" />
     <Compile Include="Models\SearchResult.cs" />
     <Compile Include="Models\SuccessStoryCollection.cs" />
-    <Compile Include="Models\WowAchievementsData.cs" />
+    <Compile Include="Providers\BattleNet\Models\WowAchievementsData.cs" />
     <Compile Include="Models\CbData.cs" />
-    <Compile Include="Models\WowRegionResult.cs" />
+    <Compile Include="Providers\BattleNet\Models\WowRegionResult.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\ComboBoxRemovable.xaml.cs">
       <DependentUpon>ComboBoxRemovable.xaml</DependentUpon>
     </Compile>
@@ -240,15 +240,15 @@
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
       <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\NDS.cs" />
+    <Compile Include="Providers\RetroAchievements\Services\NDS.cs" />
     <Compile Include="Services\SuccessStoryDatabase.cs" />
     <Compile Include="Services\SuccessStorySearch.cs" />
     <Compile Include="SuccessStory.cs" />
     <Compile Include="SuccessStorySettings.cs" />
-    <Compile Include="Views\Interfaces\OverwatchCareerStats.xaml.cs">
+    <Compile Include="Providers\BattleNet\Views\Interfaces\OverwatchCareerStats.xaml.cs">
       <DependentUpon>OverwatchCareerStats.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Interfaces\OverwatchStats.xaml.cs">
+    <Compile Include="Providers\BattleNet\Views\Interfaces\OverwatchStats.xaml.cs">
       <DependentUpon>OverwatchStats.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\Interfaces\SettingsOrderAchievement.xaml.cs">
@@ -266,7 +266,7 @@
     <Compile Include="Views\SuccessStoryOneGameView.xaml.cs">
       <DependentUpon>SuccessStoryOneGameView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\SuccessStoryOverwatchView.xaml.cs">
+    <Compile Include="Providers\BattleNet\Views\SuccessStoryOverwatchView.xaml.cs">
       <DependentUpon>SuccessStoryOverwatchView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SuccessStorySettingsView.xaml.cs">
@@ -471,11 +471,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\Interfaces\OverwatchCareerStats.xaml">
+    <Page Include="Providers\BattleNet\Views\Interfaces\OverwatchCareerStats.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\Interfaces\OverwatchStats.xaml">
+    <Page Include="Providers\BattleNet\Views\Interfaces\OverwatchStats.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -499,7 +499,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\SuccessStoryOverwatchView.xaml">
+    <Page Include="Providers\BattleNet\Views\SuccessStoryOverwatchView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -710,6 +710,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsStores\CommonPluginsStores.projitems" Label="Shared" />
