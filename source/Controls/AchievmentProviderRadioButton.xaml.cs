@@ -26,6 +26,6 @@ namespace SuccessStory.Controls
         }
 
         public string Text { get; internal set; } = "Provider";
-        public string Glyph { get; internal set; } = "\uEA56";
+        public string Glyph { get; internal set; } = "\uEA58";
     }
 }

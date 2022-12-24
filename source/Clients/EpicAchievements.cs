@@ -14,6 +14,13 @@ using static SuccessStory.Services.SuccessStoryDatabase;
 
 namespace SuccessStory.Clients
 {
+    class EpicAchivementsFactory : IAchievementFactory
+    {
+        public void BuildClient(Dictionary<string, GenericAchievements> Providers, Dictionary<string, ISearchableManualAchievements> ManualSearchProviders, Dictionary<string, IMetadataAugmentAchievements> AchievementMetadataAugmenters)
+        {
+            Providers[AchievementSource.Epic] = new EpicAchievements();
+        }
+    }
     class EpicAchievements : GenericAchievements
     {
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)

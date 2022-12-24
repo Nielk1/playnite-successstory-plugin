@@ -386,7 +386,7 @@ namespace SuccessStory.Clients
                             var achievement = gameAchievements.Items.Find(x => x.Name.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
                             if (achievement == null)
                             {
-                                achievement = gameAchievements.Items.Find(x => x.ApiName.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
+                                achievement = gameAchievements.Items.Find(x => x.ApiName != null && x.ApiName.Equals(y.Name, StringComparison.InvariantCultureIgnoreCase));
                             }
 
                             if (achievement != null)
