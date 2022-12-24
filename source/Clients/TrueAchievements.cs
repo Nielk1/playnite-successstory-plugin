@@ -32,7 +32,7 @@ namespace SuccessStory.Clients
             return false;
         }
 
-        public override bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
+        private bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
         {
             DateTime? lastUpdateS = gameAchievements.GetExtraHandlerDate("TrueSteam", "Time");
             DateTime? lastUpdateX = gameAchievements.GetExtraHandlerDate("TrueXbox", "Time");

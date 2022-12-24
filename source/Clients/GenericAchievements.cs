@@ -78,10 +78,10 @@ namespace SuccessStory.Clients
         {
             return 0;
         }
-        public virtual bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
-        {
-            return false;
-        }
+        //public virtual bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
+        //{
+        //    return false;
+        //}
         public virtual dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
         {
             return null;

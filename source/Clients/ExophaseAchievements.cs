@@ -539,7 +539,7 @@ namespace SuccessStory.Clients
 
 
 
-        public bool RefreshRarity(GameAchievements gameAchievements)
+        private bool RefreshRarity(GameAchievements gameAchievements)
         {
             return SetRarity(gameAchievements, gameAchievements.Handler);
         }

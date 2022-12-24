@@ -1576,7 +1576,7 @@ namespace SuccessStory.Clients
 
 
 
-        public bool RefreshRarity(GameAchievements gameAchievements)
+        private bool RefreshRarity(GameAchievements gameAchievements)
         {
             bool providerMatched = false;
 
