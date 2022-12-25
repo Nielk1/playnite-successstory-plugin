@@ -458,12 +458,13 @@ namespace SuccessStory
                 dateEnd = new DateTime(dateStart.Year, dateStart.Month, DateTime.DaysInMonth(dateStart.Year, dateStart.Month));
             }
 
-            bool IsManual = false;
-            if (SearchSources.Contains(resources.GetString("LOCSuccessStoryManualAchievements")))
-            {
-                IsManual = true;
-                SearchSources.Remove(resources.GetString("LOCSuccessStoryManualAchievements"));
-            }
+            //bool IsManual = false;
+            //if (SearchSources.Contains(resources.GetString("LOCSuccessStoryManualAchievements")))
+            //{
+            //    IsManual = true;
+            //    SearchSources.Remove(resources.GetString("LOCSuccessStoryManualAchievements"));
+            //}
+            bool IsManual = SearchSources.Contains(resources.GetString("LOCSuccessStoryManualAchievements"));
 
             successViewData.ListGames = ListGames.Where(x => CheckData(x, Min, Max, dateStart, dateEnd, IsManual, OnlyFilteredGames)).Distinct().ToObservable();
 
@@ -483,7 +484,7 @@ namespace SuccessStory
             bool bb = listViewGames.ProgressionValue <= Max;
             bool cc = !TextboxSearch.Text.IsNullOrEmpty() ? listViewGames.Name.RemoveDiacritics().Contains(TextboxSearch.Text.RemoveDiacritics(), StringComparison.InvariantCultureIgnoreCase) : true;
             bool dd = !PART_TextDate.Text.IsNullOrEmpty() ? listViewGames.DatesUnlock.Any(y => y >= dateStart && y <= dateEnd) : true;
-            bool ee = SearchSources.Count != 0 ? SearchSources.Contains(listViewGames.SourceName, StringComparer.InvariantCultureIgnoreCase) : true;
+            bool ee = SearchSources.Where(dr => dr != resources.GetString("LOCSuccessStoryManualAchievements")).Any() ? SearchSources.Contains(listViewGames.SourceName, StringComparer.InvariantCultureIgnoreCase) : true;
             bool gg = IsManual ? listViewGames.IsManual : true;
             bool hh = OnlyFilteredGames ? API.Instance.MainView.FilteredGames.Find(y => y.Id.ToString().IsEqual(listViewGames.Id)) != null : true;
             bool ii = SearchStatus.Count != 0 ? SearchStatus.Contains(listViewGames.CompletionStatus, StringComparer.InvariantCultureIgnoreCase) : true;
