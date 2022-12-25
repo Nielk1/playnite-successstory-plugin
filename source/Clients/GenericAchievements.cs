@@ -55,7 +55,7 @@ namespace SuccessStory.Clients
         /// <param name="game"></param>
         /// <param name="searchResult"></param>
         /// <returns></returns>
-        GameAchievements GetManualAchievements(Game game, SearchResult searchResult);
+        GameAchievements ApplyAchievementsFromSearchGame(Game game, SearchResult searchResult);
         /// <summary>
         /// Refresh manual achievements, used to attach initial achievements. TODO: make this apply also when refreshing manual
         /// </summary>
@@ -73,15 +73,10 @@ namespace SuccessStory.Clients
     }
     public abstract class GenericAchievements
     {
-        // TODO: make this function also detect if a specific provider is already attached, which is critical for manual achivements
         public virtual int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             return 0;
         }
-        //public virtual bool SetEstimateTimeToUnlock(Game game, GameAchievements gameAchievements)
-        //{
-        //    return false;
-        //}
         public virtual dynamic GetOneGameView(SuccessStorySettingsViewModel pluginSettings, Game gameMenu)
         {
             return null;

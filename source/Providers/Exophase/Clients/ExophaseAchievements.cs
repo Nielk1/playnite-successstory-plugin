@@ -107,7 +107,7 @@ namespace SuccessStory.Clients
             };
             return GetManualAchievementsInternal(game, searchResult, false);
         }
-        public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
+        public GameAchievements ApplyAchievementsFromSearchGame(Game game, SearchResult searchResult)
         {
             return GetManualAchievementsInternal(game, searchResult, false);
         }

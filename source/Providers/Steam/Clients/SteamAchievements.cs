@@ -187,7 +187,7 @@ namespace SuccessStory.Clients
             int.TryParse(str, out int AppId);
             return GetAchievementsInternal(game, AppId, false);
         }
-        public GameAchievements GetManualAchievements(Game game, SearchResult searchResult)
+        public GameAchievements ApplyAchievementsFromSearchGame(Game game, SearchResult searchResult)
         {
             return GetAchievementsInternal(game, searchResult.AppId, false);
         }

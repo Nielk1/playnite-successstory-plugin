@@ -96,7 +96,7 @@ namespace SuccessStory.Views
             ISearchableManualAchievements searchProvider = GetSelectedHandler();
             if (searchProvider != null)
             {
-                gameAchievements = searchProvider.GetManualAchievements(game, searchResult);
+                gameAchievements = searchProvider.ApplyAchievementsFromSearchGame(game, searchResult);
             }
 
             ((Window)this.Parent).Close();
