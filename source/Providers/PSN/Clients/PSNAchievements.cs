@@ -14,6 +14,7 @@ using CommonPlayniteShared.PluginLibrary.PSNLibrary.Models;
 using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using System.Collections.ObjectModel;
+using Playnite.SDK;
 
 namespace SuccessStory.Clients
 {
@@ -27,6 +28,8 @@ namespace SuccessStory.Clients
     // https://andshrew.github.io/PlayStation-Trophies/#/APIv2
     class PSNAchievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.GogLibrary && settings.EnablePsn)

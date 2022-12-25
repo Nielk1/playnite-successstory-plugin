@@ -3,6 +3,7 @@ using CommonPluginsShared;
 using CommonPluginsShared.Extensions;
 using CommonPluginsStores.Epic;
 using CommonPluginsStores.Models;
+using Playnite.SDK;
 using Playnite.SDK.Models;
 using SuccessStory.Models;
 using System;
@@ -23,6 +24,8 @@ namespace SuccessStory.Clients
     }
     class EpicAchievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.EpicLibrary && settings.EnableEpic)

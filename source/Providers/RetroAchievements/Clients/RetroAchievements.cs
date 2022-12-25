@@ -44,6 +44,8 @@ namespace SuccessStory.Clients
     }
     class RetroAchievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (game.GameActions != null)
@@ -116,7 +118,7 @@ namespace SuccessStory.Clients
         }
 
 
-    public override GameAchievements GetAchievements(Game game)
+        public override GameAchievements GetAchievements(Game game)
         {
             GameAchievements gameAchievements = SuccessStory.PluginDatabase.GetDefault(game);
             List<Achievements> AllAchievements = new List<Achievements>();

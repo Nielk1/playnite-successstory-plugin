@@ -3,6 +3,7 @@ using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Models;
 using CommonPluginsStores;
 using CommonPluginsStores.Steam;
+using Playnite.SDK;
 using Playnite.SDK.Data;
 using Playnite.SDK.Models;
 using SuccessStory.Converters;
@@ -19,6 +20,8 @@ namespace SuccessStory.Clients
 {
     class SteamEmulators : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         protected static SteamApi _steamApi;
         internal static SteamApi steamApi
         {

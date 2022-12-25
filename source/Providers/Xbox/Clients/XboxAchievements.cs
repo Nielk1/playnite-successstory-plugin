@@ -29,6 +29,8 @@ namespace SuccessStory.Clients
     }
     class XboxAchievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.None)

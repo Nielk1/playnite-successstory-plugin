@@ -24,6 +24,8 @@ namespace SuccessStory.Clients
     }
     class Rpcs3Achievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (game.GameActions != null)

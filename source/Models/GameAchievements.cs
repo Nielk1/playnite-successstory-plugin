@@ -35,6 +35,17 @@ namespace SuccessStory.Models
                 }
             }
         }
+        public string GetExtraHandlerId(string name)
+        {
+            lock (ExtraHandlersLock)
+            {
+                if (ExtraHandlers == null)
+                    return null;
+                if (!ExtraHandlers.ContainsKey(name))
+                    return null;
+                return ExtraHandlers[name].Id;
+            }
+        }
         public DateTime? GetExtraHandlerDate(string name, string field)
         {
             lock (ExtraHandlersLock)

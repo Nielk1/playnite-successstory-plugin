@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using CommonPluginsStores.Models;
 using System.Linq;
 using static SuccessStory.Services.SuccessStoryDatabase;
+using Playnite.SDK;
 
 namespace SuccessStory.Clients
 {
@@ -22,6 +23,8 @@ namespace SuccessStory.Clients
     }
     class OriginAchievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (pluginType == ExternalPlugin.OriginLibrary && settings.EnableOrigin)

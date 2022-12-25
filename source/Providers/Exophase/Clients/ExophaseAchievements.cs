@@ -45,11 +45,16 @@ namespace SuccessStory.Clients
     }
     class ExophaseAchievements : GenericAchievements, ISearchableManualAchievements, IMetadataAugmentAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         private const string UrlExophaseSearch = @"https://api.exophase.com/public/archive/games?q={0}&sort=added";
         private const string UrlExophase = @"https://www.exophase.com";
         private readonly string UrlExophaseLogin = $"{UrlExophase}/login";
         private readonly string UrlExophaseLogout = $"{UrlExophase}/logout";
         private readonly string UrlExophaseAccount = $"{UrlExophase}/account";
+        
+        // used by new conversion of saved ID to achievement URLs
+        private readonly string UrlExophaseAchievements = $"{UrlExophase}/game/{{0}}/achievements/";
 
         public ExophaseAchievements() : base("Exophase")
         {
@@ -302,10 +307,21 @@ namespace SuccessStory.Clients
 
 
 
-
+        // TODO: use the new sound handler check, or hell get rid of the parm entirely and use the gameAchievements object instead and eliminate the paramater
         private string GetAchievementsPageUrl(GameAchievements gameAchievements, MainAchievementHandler source)
         {
             bool UsedSplit = false;
+
+            if (gameAchievements.Handler.Name == "Exophase" && !string.IsNullOrWhiteSpace(gameAchievements.Handler.Id))
+            {
+                return string.Format(UrlExophaseAchievements, gameAchievements.Handler.Id);
+            }
+
+            string extraId = gameAchievements.GetExtraHandlerId("Exophase");
+            if (!string.IsNullOrWhiteSpace(extraId))
+            {
+                return string.Format(UrlExophaseAchievements, extraId);
+            }
 
             string sourceLinkName = gameAchievements.SourcesLink?.Name;
             if (sourceLinkName == "Exophase")
@@ -416,13 +432,13 @@ namespace SuccessStory.Clients
         }
 
 
-        public void SetMissingDescription(GameAchievements gameAchievements, MainAchievementHandler source)
+        public bool SetMissingDescription(GameAchievements gameAchievements, MainAchievementHandler source)
         {
             string achievementsUrl = GetAchievementsPageUrl(gameAchievements, source);
             if (achievementsUrl.IsNullOrEmpty())
             {
                 logger.Warn($"No Exophase (description) url find for {gameAchievements.Name} - {gameAchievements.Id}");
-                return;
+                return false;
             }
 
             try
@@ -454,11 +470,17 @@ namespace SuccessStory.Clients
                 });
 
                 PluginDatabase.AddOrUpdate(gameAchievements);
+
+                // if we got any data at all and none of the descriptions are blank now, say success and we stop, no need for others
+                if (exophaseAchievements.Count > 0 && !gameAchievements.Items.Any(x => string.IsNullOrWhiteSpace(x.Description)))
+                    return true;
             }
             catch (Exception ex)
             {
                 Common.LogError(ex, false, true, PluginDatabase.PluginName);
             }
+
+            return false;
         }
 
         /// <summary>
@@ -539,6 +561,14 @@ namespace SuccessStory.Clients
 
 
 
+        private bool GetHiddenDescriptions(GameAchievements gameAchievements)
+        {
+            if (!gameAchievements.HasAchievements)
+                return false;
+            if (!gameAchievements.Items.Any(x => string.IsNullOrWhiteSpace(x.Description)))
+                return false;
+            return SetMissingDescription(gameAchievements, gameAchievements.Handler);
+        }
         private bool RefreshRarity(GameAchievements gameAchievements)
         {
             return SetRarity(gameAchievements, gameAchievements.Handler);
@@ -550,10 +580,12 @@ namespace SuccessStory.Clients
             {
                 case "Rarity":
                     return 1;
+                case "HiddenDescription":
+                    return 2;
             }
             return 0;
         }
-        public string[] GetAugmentTypes() => new string[] { "Rarity" };
+        public string[] GetAugmentTypes() => new string[] { "Rarity", "HiddenDescription" };
         public string[] GetAugmentTypesManual() => GetAugmentTypes();
 
         public bool RefreshAugmenterMetadata(string augmenter, GameAchievements gameAchievements)
@@ -562,6 +594,8 @@ namespace SuccessStory.Clients
             {
                 case "Rarity":
                     return RefreshRarity(gameAchievements);
+                case "HiddenDescription":
+                    return GetHiddenDescriptions(gameAchievements);
             }
             return false;
         }

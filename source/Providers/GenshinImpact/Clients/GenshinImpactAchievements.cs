@@ -25,6 +25,8 @@ namespace SuccessStory.Clients
     }
     class GenshinImpactAchievements : GenericAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         public override int CheckAchivementSourceRank(ExternalPlugin pluginType, SuccessStorySettings settings, Game game)
         {
             if (game.Name.IsEqual("Genshin Impact"))

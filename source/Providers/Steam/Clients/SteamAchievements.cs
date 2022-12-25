@@ -40,6 +40,8 @@ namespace SuccessStory.Clients
     }
     class SteamAchievements : GenericAchievements, ISearchableManualAchievements, IMetadataAugmentAchievements
     {
+        internal static new ILogger logger => LogManager.GetLogger();
+
         protected static SteamApi _steamApi;
         internal static SteamApi steamApi
         {
@@ -56,18 +58,18 @@ namespace SuccessStory.Clients
         }
 
         private IHtmlDocument HtmlDocument { get; set; } = null;
- 
+
         private static string SteamId { get; set; } = string.Empty;
         private static string SteamApiKey { get; set; } = string.Empty;
         private static string SteamUser { get; set; } = string.Empty;
 
-        private static string UrlProfil         => @"https://steamcommunity.com/my/profile";
-        private static string UrlProfilById     => @"https://steamcommunity.com/profiles/{0}/stats/{1}?tab=achievements&l={2}";
-        private static string UrlProfilByName   => @"https://steamcommunity.com/id/{0}/stats/{1}?tab=achievements&l={2}";
+        private static string UrlProfil => @"https://steamcommunity.com/my/profile";
+        private static string UrlProfilById => @"https://steamcommunity.com/profiles/{0}/stats/{1}?tab=achievements&l={2}";
+        private static string UrlProfilByName => @"https://steamcommunity.com/id/{0}/stats/{1}?tab=achievements&l={2}";
 
-        private static string UrlAchievements   => @"https://steamcommunity.com/stats/{0}/achievements/?l={1}";
+        private static string UrlAchievements => @"https://steamcommunity.com/stats/{0}/achievements/?l={1}";
 
-        private static string UrlSearch         => @"https://store.steampowered.com/search/?term={0}";
+        private static string UrlSearch => @"https://store.steampowered.com/search/?term={0}";
 
 
         public override void GetFilterItems(bool isRetroAchievements, Collection<ListSource> filterSourceItems)
@@ -439,7 +441,7 @@ namespace SuccessStory.Clients
             }
 
             // Set rarity
-            if (gameAchievements.HasAchievements)
+            /*if (gameAchievements.HasAchievements)
             {
                 if (ProgressOnSteam && (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi || PluginDatabase.PluginSettings.Settings.SteamIsPrivate))
                 {
@@ -463,10 +465,10 @@ namespace SuccessStory.Clients
                         Common.LogError(ex, false, true, PluginDatabase.PluginName);
                     }
                 }
-            }
+            }*/
 
             // Set missing description
-            if (gameAchievements.HasAchievements)
+            /*if (gameAchievements.HasAchievements)
             {
                 if (ProgressOnSteam)
                 {
@@ -478,11 +480,10 @@ namespace SuccessStory.Clients
                         }
                     });
                 }
-                /*
-                ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
-                exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSourceOld.Steam);
-                */
-            }
+                
+                //ExophaseAchievements exophaseAchievements = new ExophaseAchievements();
+                //exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSourceOld.Steam);
+            }*/
 
             return gameAchievements;
         }
@@ -523,7 +524,7 @@ namespace SuccessStory.Clients
                             CachedConfigurationValidationResult = false;
                         }
                     }
-                    
+
                     if (CachedConfigurationValidationResult == null)
                     {
                         CachedConfigurationValidationResult = true;
@@ -570,7 +571,7 @@ namespace SuccessStory.Clients
                         dynamic SteamConfig = Serialization.FromJsonFile<dynamic>(PluginDatabase.Paths.PluginUserDataPath + "\\..\\CB91DFC9-B977-43BF-8E70-55F46E410FAB\\config.json");
                         SteamId = (string)SteamConfig["UserId"];
                         SteamApiKey = (string)SteamConfig["ApiKey"];
-                        SteamUser = steamApi.GetSteamUsers()?.First()?.PersonaName;                       
+                        SteamUser = steamApi.GetSteamUsers()?.First()?.PersonaName;
                     }
                     else
                     {
@@ -588,7 +589,7 @@ namespace SuccessStory.Clients
             SteamUserAndSteamIdByWeb();
 
             if (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi)
-            {                
+            {
                 if (SteamUser.IsNullOrEmpty())
                 {
                     ShowNotificationPluginNoConfiguration(resources.GetString("LOCSuccessStoryNotificationsSteamBadConfig2"));
@@ -615,7 +616,7 @@ namespace SuccessStory.Clients
             //}
             //else
             //{
-                return PluginDatabase.PluginSettings.Settings.EnableSteam;
+            return PluginDatabase.PluginSettings.Settings.EnableSteam;
             //}
         }
         #endregion
@@ -1563,7 +1564,7 @@ namespace SuccessStory.Clients
                 $"{PluginDatabase.PluginName}-{ClientName.RemoveWhiteSpace()}-nopublic",
                 $"{PluginDatabase.PluginName}\r\n{Message}",
                 NotificationType.Error,
-                () => 
+                () =>
                 {
                     ResetCachedConfigurationValidationResult();
                     ResetCachedIsConnectedResult();
@@ -1575,9 +1576,66 @@ namespace SuccessStory.Clients
 
 
 
+        private bool GetHiddenDescriptions(GameAchievements gameAchievements)
+        {
+            if (!gameAchievements.HasAchievements)
+                return false;
 
+            if (!gameAchievements.Items.Any(x => string.IsNullOrWhiteSpace(x.Description)))
+                return false;
+
+            bool success = false;
+
+            // path for if handler is already Steam, as we don't use Steam for HiddenDescriptions unless our primary is already Steam
+            if (gameAchievements.Handler.Name == "Steam")
+            {
+                int.TryParse(gameAchievements.Handler.Id, out int AppId);
+                if (AppId != 0)
+                {
+                    DateTime? lastUpdate = gameAchievements.GetExtraHandlerDate("Steam", "HiddenDescription");
+                    success = lastUpdate.HasValue; // if there's a date here, we know we've had this data before and thus we are the winner
+
+                    if ((lastUpdate ?? DateTime.MinValue) < DateTime.UtcNow.AddDays(-1))
+                    {
+                        // does this page work when private? should as it works when logged out and contains no user id
+                        if (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi)
+                        {
+                            try
+                            {
+                                if (!gameAchievements.IsManual)
+                                {
+                                    bool GotAllDescriptions = true;
+                                    gameAchievements.Items.ForEach(x =>
+                                    {
+                                        if (x.IsHidden && x.Description.IsNullOrEmpty())
+                                        {
+                                            x.Description = FindHiddenDescription(AppId, x.Name);
+                                            if (string.IsNullOrWhiteSpace(x.Description))
+                                                GotAllDescriptions = false;
+                                        }
+                                    });
+
+                                    PluginDatabase.AddOrUpdate(gameAchievements);
+
+                                    // we did not succeed if there are any descriptions missing, let the next provider try
+                                    success = GotAllDescriptions;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                            }
+                        }
+                    }
+                }
+            }
+            return success;
+        }
         private bool RefreshRarity(GameAchievements gameAchievements)
         {
+            if (!gameAchievements.HasAchievements)
+                return false;
+
             bool providerMatched = false;
 
             // path for if handler is already Steam, as we don't use Steam for rarity unless our primary is already Steam
@@ -1588,21 +1646,43 @@ namespace SuccessStory.Clients
                 {
                     DateTime? lastUpdate = gameAchievements.GetExtraHandlerDate("Steam", "Rarity");
                     providerMatched = lastUpdate.HasValue; // if there's a date here, we know we've had this data before and thus we are the winner
-                    if (IsConfigured())
+
+                    if ((lastUpdate ?? DateTime.MinValue) < DateTime.UtcNow.AddDays(-1))
                     {
-                        if ((lastUpdate ?? DateTime.MinValue) < DateTime.UtcNow.AddDays(-1))
+                        // does this page work when private? should as it works when logged out and contains no user id
+                        if (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi)
                         {
-                            gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
-                            gameAchievements.SetExtraHandlerDate("Steam", AppId.ToString(), "Rarity");
+                            try
+                            {
+                                gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebPage(AppId, gameAchievements.Items);
+                                gameAchievements.SetExtraHandlerDate("Steam", AppId.ToString(), "Rarity");
 
-                            PluginDatabase.AddOrUpdate(gameAchievements);
+                                PluginDatabase.AddOrUpdate(gameAchievements);
 
-                            providerMatched = true;
+                                providerMatched = true;
+                            }
+                            catch (Exception ex)
+                            {
+                                Common.LogError(ex, false, true, PluginDatabase.PluginName);
+                            }
                         }
-                    }
-                    else
-                    {
-                        logger.Warn($"No Steam config");
+
+                        if (!providerMatched && !PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi && (gameAchievements.IsManual || PluginDatabase.PluginSettings.Settings.SteamIsPrivate))
+                        {
+                            if (IsConfigured())
+                            {
+                                gameAchievements.Items = GetGlobalAchievementPercentagesForAppByWebApi(AppId, gameAchievements.Items);
+                                gameAchievements.SetExtraHandlerDate("Steam", AppId.ToString(), "Rarity");
+
+                                PluginDatabase.AddOrUpdate(gameAchievements);
+
+                                providerMatched = true;
+                            }
+                            else
+                            {
+                                logger.Warn($"No Steam config");
+                            }
+                        }
                     }
                 }
             }
@@ -1615,10 +1695,12 @@ namespace SuccessStory.Clients
             {
                 case "Rarity":
                     return 2;
+                case "HiddenDescription":
+                    return 2;
             }
             return 0;
         }
-        public string[] GetAugmentTypes() => new string[] { "Rarity" };
+        public string[] GetAugmentTypes() => new string[] { "Rarity", "HiddenDescription" };
         public string[] GetAugmentTypesManual() => GetAugmentTypes();
 
         public bool RefreshAugmenterMetadata(string augmenter, GameAchievements gameAchievements)
@@ -1627,6 +1709,8 @@ namespace SuccessStory.Clients
             {
                 case "Rarity":
                     return RefreshRarity(gameAchievements);
+                case "HiddenDescription":
+                    return GetHiddenDescriptions(gameAchievements);
             }
             return false;
         }

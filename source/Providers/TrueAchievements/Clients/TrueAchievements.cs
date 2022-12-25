@@ -99,7 +99,7 @@ namespace SuccessStory.Clients
 
 
 
-        internal static readonly ILogger logger = LogManager.GetLogger();
+        internal static new readonly ILogger logger = LogManager.GetLogger();
 
         private static SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;
 
