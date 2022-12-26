@@ -481,7 +481,6 @@ namespace SuccessStory.Services
 
             if (PluginSettings.Settings.EnableRetroAchievementsView && PluginSettings.Settings.EnableRetroAchievements)
             {
-                //TODO: _isRetroachievements this is never set
                 if (_isRetroachievements)
                 {
                     if (PluginSettings.Settings.EnableRetroAchievements)
