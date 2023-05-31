@@ -3,6 +3,7 @@ using CommonPluginsShared.Collections;
 using CommonPluginsShared.Controls;
 using CommonPluginsShared.Extensions;
 using CommonPluginsShared.Interfaces;
+using CommonPluginsShared.Plugins;
 using Playnite.SDK.Models;
 using SuccessStory.Models;
 using SuccessStory.Services;
@@ -86,19 +87,16 @@ namespace SuccessStory.Controls
         private void PART_PluginButton_Click(object sender, RoutedEventArgs e)
         {
             dynamic ViewExtension = null;
-            if (PluginDatabase.GameContext.Name.IsEqual("overwatch") && (PluginDatabase.GameContext.Source?.Name?.IsEqual("battle.net") ?? false))
+
+            foreach (var Provider in SuccessStoryDatabase.AchievementProviders)
             {
-                ViewExtension = new SuccessStoryOverwatchView(PluginDatabase.GameContext);
+                ViewExtension = Provider.Value.GetOneGameView(PluginDatabase.PluginSettings, PluginDatabase.GameContext);
+                if (ViewExtension != null)
+                {
+                    break;
+                }
             }
-            else if (PluginDatabase.PluginSettings.Settings.EnableGenshinImpact && PluginDatabase.GameContext.Name.IsEqual("Genshin Impact"))
-            {
-                ViewExtension = new SuccessStoryCategoryView(PluginDatabase.GameContext);
-            }
-            else if (PluginDatabase.PluginSettings.Settings.EnableGuildWars2 && PluginDatabase.GameContext.Name.IsEqual("Guild Wars 2"))
-            {
-                ViewExtension = new SuccessStoryCategoryView(PluginDatabase.GameContext);
-            }
-            else
+            if (ViewExtension == null)
             {
                 ViewExtension = new SuccessStoryOneGameView(PluginDatabase.GameContext);
             }

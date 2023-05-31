@@ -30,6 +30,7 @@ using CommonPluginsStores.Steam;
 using SuccessStory.Clients;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using System.Net;
+using CommonPluginsShared.Plugins;
 
 namespace SuccessStory
 {
@@ -162,19 +163,15 @@ namespace SuccessStory
 
                     if (PluginDatabase.PluginSettings.Settings.EnableOneGameView)
                     {
-                        if (PluginDatabase.GameContext.Name.IsEqual("overwatch") && (PluginDatabase.GameContext.Source?.Name?.IsEqual("battle.net") ?? false))
+                        foreach (var Provider in AchievementProviders)
                         {
-                            ViewExtension = new SuccessStoryOverwatchView(PluginDatabase.GameContext);
+                            ViewExtension = Provider.Value.GetOneGameView(PluginSettings, PluginDatabase.GameContext);
+                            if (ViewExtension != null)
+                            {
+                                break;
+                            }
                         }
-                        else if (PluginSettings.Settings.EnableGenshinImpact && PluginDatabase.GameContext.Name.IsEqual("Genshin Impact"))
-                        {
-                            ViewExtension = new SuccessStoryCategoryView(PluginDatabase.GameContext);
-                        }
-                        else if (PluginSettings.Settings.EnableGuildWars2 && PluginDatabase.GameContext.Name.IsEqual("Guild Wars 2"))
-                        {
-                            ViewExtension = new SuccessStoryCategoryView(PluginDatabase.GameContext);
-                        }
-                        else
+                        if (ViewExtension == null)
                         {
                             ViewExtension = new SuccessStoryOneGameView(PluginDatabase.GameContext);
                         }
