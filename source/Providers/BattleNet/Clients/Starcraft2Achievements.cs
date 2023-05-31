@@ -171,7 +171,7 @@ namespace SuccessStory.Clients
                 exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Starcraft2);
             }*/
 
-
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 

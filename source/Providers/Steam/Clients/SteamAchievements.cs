@@ -485,6 +485,7 @@ namespace SuccessStory.Clients
                 //exophaseAchievements.SetMissingDescription(gameAchievements, AchievementSourceOld.Steam);
             }*/
 
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 

@@ -122,6 +122,7 @@ namespace SuccessStory.Clients
             {
                 gameAchievements.Items = data.Achievements;
                 gameAchievements.ItemsStats = data.Stats;
+                gameAchievements.SetRaretyIndicator();
                 return gameAchievements;
             }
             else
@@ -130,6 +131,7 @@ namespace SuccessStory.Clients
                 {
                     gameAchievements.Items = data.Achievements;
                     gameAchievements.ItemsStats = data.Stats;
+                    gameAchievements.SetRaretyIndicator();
                     return gameAchievements;
                 }
 
@@ -146,6 +148,7 @@ namespace SuccessStory.Clients
                     }
                 });
                 gameAchievementsCached.ItemsStats = data.Stats;
+                gameAchievementsCached.SetRaretyIndicator();
                 return gameAchievementsCached;
             }
         }

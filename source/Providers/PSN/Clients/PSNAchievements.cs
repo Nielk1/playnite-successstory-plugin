@@ -233,6 +233,7 @@ namespace SuccessStory.Clients
                 gameAchievements.Handler = new MainAchievementHandler("PSN", game.GameId);
             }
 
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 

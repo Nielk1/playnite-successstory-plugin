@@ -155,7 +155,7 @@ namespace SuccessStory.Clients
                 exophaseAchievements.SetRarety(gameAchievements, AchievementSourceOld.Xbox);
             }*/
 
-
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 

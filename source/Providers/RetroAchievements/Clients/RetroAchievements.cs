@@ -194,6 +194,7 @@ namespace SuccessStory.Clients
                 gameAchievements.Handler = new MainAchievementHandler("RetroAchievements", gameAchievements.RAgameID.ToString());
             }
 
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 

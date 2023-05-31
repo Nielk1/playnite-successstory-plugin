@@ -135,6 +135,7 @@ namespace SuccessStory.Clients
                 ShowNotificationPluginNoAuthenticate(resources.GetString("LOCSuccessStoryNotificationsEpicNoAuthenticate"), ExternalPlugin.EpicLibrary);
             }
 
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 

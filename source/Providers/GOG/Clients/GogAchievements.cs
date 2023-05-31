@@ -119,6 +119,7 @@ namespace SuccessStory.Clients
                 ShowNotificationPluginNoAuthenticate(resources.GetString("LOCSuccessStoryNotificationsGogNoAuthenticate"), ExternalPlugin.GogLibrary);
             }
 
+            gameAchievements.SetRaretyIndicator();
             return gameAchievements;
         }
 
