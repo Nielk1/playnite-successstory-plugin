@@ -252,7 +252,28 @@ namespace SuccessStory.Clients
 
                 if (AllAchievements.Count > 0)
                 {
-                    Tuple<List<Achievements>, List<GameStats>> DataCompleted = GetSchemaForGame(AppId, AllAchievements, AllStats);
+                    bool GotAchivementsFromApi;
+                    Tuple<List<Achievements>, List<GameStats>> DataCompleted = GetSchemaForGame(AppId, AllAchievements, AllStats, out GotAchivementsFromApi);
+
+                    // if we didn't take advantage of the existing loop in GetSchemaForGame, loop again here
+                    if (!GotAchivementsFromApi)
+                    {
+                        foreach (Achievements ExistingData in DataCompleted.Item1)
+                        {
+                            if (ExistingData != null)
+                            {
+                                if (ExistingData.UrlUnlocked != null
+                                 && (ExistingData.UrlUnlocked.EndsWith("/")
+                                     || (ExistingData.UrlUnlocked.Contains("steamcdn-a.akamaihd.net") && ExistingData.UrlUnlocked.Length < 75)
+                                    )) ExistingData.UrlUnlocked = null;
+
+                                if (ExistingData.UrlLocked != null
+                                 && (   ExistingData.UrlLocked.EndsWith("/")
+                                     || (ExistingData.UrlLocked.Contains("steamcdn-a.akamaihd.net") && ExistingData.UrlLocked.Length < 75)
+                                    )) ExistingData.UrlLocked = ExistingData.UrlUnlocked;
+                            }
+                        }
+                    }
 
                     bool IsOK = GetByWeb ? GetByWeb : Web.DownloadFileImageTest(AllAchievements[0].UrlLocked).GetAwaiter().GetResult();
                     if (IsOK)
@@ -971,8 +992,9 @@ namespace SuccessStory.Clients
             return AllAchievements;
         }
 
-        private Tuple<List<Achievements>, List<GameStats>> GetSchemaForGame(int AppId, List<Achievements> AllAchievements, List<GameStats> AllStats)
+        private Tuple<List<Achievements>, List<GameStats>> GetSchemaForGame(int AppId, List<Achievements> AllAchievements, List<GameStats> AllStats, out bool GotAchivementsFromApi)
         {
+            GotAchivementsFromApi = false;
             try
             {
                 if (PluginDatabase.PluginSettings.Settings.EnableSteamWithoutWebApi)
@@ -1000,12 +1022,19 @@ namespace SuccessStory.Clients
                                 ExistingData.IsHidden = AchievementsData.Children?.Find(x => x.Name.IsEqual("hidden")).Value == "1";
 
                                 ExistingData.UrlUnlocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icon")).Value;
-                                if (ExistingData.UrlUnlocked?.EndsWith("/") ?? true) ExistingData.UrlUnlocked = null;
+                                if (ExistingData.UrlUnlocked != null
+                                 && (ExistingData.UrlUnlocked.EndsWith("/")
+                                     || (ExistingData.UrlUnlocked.Contains("steamcdn-a.akamaihd.net") && ExistingData.UrlUnlocked.Length < 75)
+                                    )) ExistingData.UrlUnlocked = null;
 
-                                ExistingData.UrlLocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icongray")).Value;
-                                if (ExistingData.UrlLocked?.EndsWith("/") ?? true) ExistingData.UrlLocked = ExistingData.UrlUnlocked;
+                                ExistingData.UrlLocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icongray"))?.Value;
+                                if (ExistingData.UrlLocked != null
+                                 && (   ExistingData.UrlLocked.EndsWith("/")
+                                     || (ExistingData.UrlLocked.Contains("steamcdn-a.akamaihd.net") && ExistingData.UrlLocked.Length < 75)
+                                    )) ExistingData.UrlLocked = ExistingData.UrlUnlocked;
                             }
                         }
+                        GotAchivementsFromApi = true; // don't loop again, we already handled image crap
                     }
                     catch (Exception ex)
                     {

@@ -89,7 +89,6 @@ namespace SuccessStory.Models
         [DontSerialize]
         public string ImageLocked
         {
-            // TODO tight coupling?
             get
             {
                 return !UrlLocked.IsNullOrEmpty() && UrlLocked != UrlUnlocked ? ImageSourceManagerPlugin.GetImagePath(UrlLocked, 256) : ImageUnlocked;
@@ -126,14 +125,7 @@ namespace SuccessStory.Models
                     }
                     else
                     {
-                        if (UrlLocked != null && UrlLocked.Contains("steamcdn-a.akamaihd.net") && UrlLocked.Length < 75)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            return UrlLocked.IsNullOrEmpty() || !UrlUnlocked.IsNullOrEmpty() || UrlLocked == UrlUnlocked;
-                        }
+                        return (UrlLocked.IsNullOrEmpty() && !UrlUnlocked.IsNullOrEmpty()) || UrlLocked == UrlUnlocked;
                     }
                 }
                 catch (Exception ex)
