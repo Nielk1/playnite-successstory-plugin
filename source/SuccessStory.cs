@@ -196,7 +196,7 @@ namespace SuccessStory
                         }
                     }
 
- 
+
                     Window windowExtension = PlayniteUiHelper.CreateExtensionWindow(PlayniteApi, resources.GetString("LOCSuccessStory"), ViewExtension, windowOptions);
                     if (windowOptions.ShowMaximizeButton)
                     {
@@ -405,7 +405,6 @@ namespace SuccessStory
                                             break;
                                         }
                                     }
-
                                     if (ViewExtension == null)
                                     {
                                         ViewExtension = new SuccessStoryOneGameView(GameMenu);
@@ -570,9 +569,9 @@ namespace SuccessStory
             {
                 MenuSection = resources.GetString("LOCSuccessStory"),
                 Description = "Test",
-                Action = (mainMenuItem) => 
+                Action = (mainMenuItem) =>
                 {
-                    
+
                 }
             });
 #endif
@@ -778,7 +777,7 @@ namespace SuccessStory
             {
                 MenuSection = MenuInExtensions + resources.GetString("LOCSuccessStory"),
                 Description = "Test",
-                Action = (mainMenuItem) => 
+                Action = (mainMenuItem) =>
                 {
 
                 }
@@ -821,7 +820,7 @@ namespace SuccessStory
                             string SourceName = PlayniteTools.GetSourceName(game);
 
                             if (gameAchievements.IsManual)
-                            {                                
+                            {
                                 int AppId = steamApi.GetAppId(gameAchievements.Name);
 
                                 if (AppId != 0)
@@ -1167,7 +1166,7 @@ namespace SuccessStory
                 }
             });
         }
-        #endregion  
+        #endregion
 
 
         #region Application event
@@ -1175,7 +1174,7 @@ namespace SuccessStory
         public override void OnApplicationStarted(OnApplicationStartedEventArgs args)
         {
             // TODO - Removed for Playnite 11
-            if (!PluginSettings.Settings.PurgeImageCache) 
+            if (!PluginSettings.Settings.PurgeImageCache)
             {
                 PluginDatabase.ClearCache();
                 PluginSettings.Settings.PurgeImageCache = true;
@@ -1207,15 +1206,15 @@ namespace SuccessStory
                             return;
                         }
 
-                        x.Items.ForEach(y => 
+                        x.Items.ForEach(y =>
                         {
                             if (ct.IsCancellationRequested)
                             {
                                 return;
                             }
 
-                            try 
-                            { 
+                            try
+                            {
                                 if (!y.ImageLockedIsCached)
                                 {
                                     var a = y.ImageLocked;
@@ -1265,7 +1264,7 @@ namespace SuccessStory
 
             // TODO this is called even if RetroAchivements is not configured, and is a static function so it can't check IsConfigured, refactor
             // Initialize list console for RA
-            if (PluginSettings.Settings.RaConsoleAssociateds?.Count == 0)
+            if (PluginSettings.Settings.EnableRetroAchievements == true && PluginSettings.Settings.RaConsoleAssociateds?.Count == 0)
             {
                 PluginSettings.Settings.RaConsoleAssociateds = new List<RaConsoleAssociated>();
                 RA_Consoles ra_Consoles = RetroAchievements.GetConsoleIDs();
