@@ -52,8 +52,8 @@ namespace SuccessStory.Clients
 
         private const string UrlStarCraft2 = @"https://starcraft2.com/";
         private const string UrlStarCraft2Login = @"https://starcraft2.com/login";
-        private const string UrlStarCraft2ProfilInfo = @"https://starcraft2.com/fr-fr/api/sc2/profile/2/1/{0}?locale={1}";
-        private const string UrlStarCraft2AchInfo = @"https://starcraft2.com/fr-fr/api/sc2/static/profile/2?locale={0}";
+        private const string UrlStarCraft2ProfilInfo = @"https://starcraft2.com/api/sc2/profile/{2}/1/{0}?locale={1}";
+        private const string UrlStarCraft2AchInfo = @"https://starcraft2.com/api/sc2/static/profile/2?locale={0}";
 
         private string UrlProfil = string.Empty;
 
@@ -73,9 +73,23 @@ namespace SuccessStory.Clients
             {
                 if (!UrlProfil.IsNullOrEmpty())
                 {
+                    string region = "0";
+                    if(UrlProfil.IndexOf("profile/1/1") > -1)
+                    {
+                        region = "1";
+                    }
+                    if(UrlProfil.IndexOf("profile/2/1") > -1)
+                    {
+                        region = "2";
+                    }
+                    if(UrlProfil.IndexOf("profile/3/1") > -1)
+                    {
+                        region = "3";
+                    }
+
                     UserSc2Id = UrlProfil.Split('/').Last();
 
-                    string UrlStarCraft2ProfilInfo = string.Format(Starcraft2Achievements.UrlStarCraft2ProfilInfo, UserSc2Id, LocalLang);
+                    string UrlStarCraft2ProfilInfo = string.Format(Starcraft2Achievements.UrlStarCraft2ProfilInfo, UserSc2Id, LocalLang, region);
                     string UrlStarCraft2AchInfo = string.Format(Starcraft2Achievements.UrlStarCraft2AchInfo, LocalLang);
 
                     string data = Web.DownloadStringData(UrlStarCraft2ProfilInfo, GetCookies()).GetAwaiter().GetResult();
@@ -248,6 +262,17 @@ namespace SuccessStory.Clients
                 {
                     using (var WebView = PluginDatabase.PlayniteApi.WebViews.CreateView(400, 600))
                     {
+                        WebView.LoadingChanged += (s, e) =>
+                        {
+                            string address = WebView.GetCurrentAddress();
+                            if (!address.Contains(UrlLogin) && !address.Contains(UrlStarCraft2Login))
+                            {
+                                ResetCachedConfigurationValidationResult();
+                                ResetCachedIsConnectedResult();
+                                WebView.Close();
+                            }
+                        };
+
                         WebView.Navigate(UrlStarCraft2Login);
                         WebView.OpenDialog();
 
