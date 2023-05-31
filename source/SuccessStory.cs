@@ -60,7 +60,7 @@ namespace SuccessStory
                 string PathDLL = Path.Combine(PluginPath, "VirtualizingWrapPanel.dll");
                 if (File.Exists(PathDLL))
                 {
-                    var DLL = Assembly.LoadFile(PathDLL);
+                    Assembly DLL = Assembly.LoadFile(PathDLL);
                 }
             }
             catch (Exception ex)
@@ -1186,14 +1186,14 @@ namespace SuccessStory
             if (PluginSettings.Settings.EnableImageCache)
             {
                 CancellationToken ct = tokenSource.Token;
-                var TaskCacheImage = Task.Run(() =>
+                Task TaskCacheImage = Task.Run(() =>
                 {
                     // Wait Playnite & extension database are loaded
                     System.Threading.SpinWait.SpinUntil(() => PlayniteApi.Database.IsOpen, -1);
                     System.Threading.SpinWait.SpinUntil(() => PluginDatabase.IsLoaded, -1);
 
                     IEnumerable<GameAchievements> db = PluginDatabase.Database.Where(x => x.HasAchievements && !x.ImageIsCached);
-                    var aa = db.Count();
+                    int aa = db.Count();
 #if DEBUG
                     Common.LogDebug(true, $"TaskCacheImage - {db.Count()} - Start");
                     Stopwatch stopwatch = new Stopwatch();
@@ -1217,11 +1217,11 @@ namespace SuccessStory
                             {
                                 if (!y.ImageLockedIsCached)
                                 {
-                                    var a = y.ImageLocked;
+                                    string a = y.ImageLocked;
                                 }
                                 if (!y.ImageLockedIsCached)
                                 {
-                                    var b = y.ImageUnlocked;
+                                    string b = y.ImageUnlocked;
                                 }
                             }
                             catch (Exception ex)
@@ -1264,7 +1264,7 @@ namespace SuccessStory
 
             // TODO this is called even if RetroAchivements is not configured, and is a static function so it can't check IsConfigured, refactor
             // Initialize list console for RA
-            if (PluginSettings.Settings.EnableRetroAchievements == true && PluginSettings.Settings.RaConsoleAssociateds?.Count == 0)
+            if (PluginSettings.Settings.EnableRetroAchievements && PluginSettings.Settings.RaConsoleAssociateds?.Count == 0)
             {
                 PluginSettings.Settings.RaConsoleAssociateds = new List<RaConsoleAssociated>();
                 RA_Consoles ra_Consoles = RetroAchievements.GetConsoleIDs();
@@ -1306,7 +1306,7 @@ namespace SuccessStory
         {
             if (PluginSettings.Settings.AutoImport)
             {
-                var PlayniteDb = PlayniteApi.Database.Games
+                List<Guid> PlayniteDb = PlayniteApi.Database.Games
                         .Where(x => x.Added != null && x.Added > PluginSettings.Settings.LastAutoLibUpdateAssetsDownload)
                         .Select(x => x.Id).ToList();
 
