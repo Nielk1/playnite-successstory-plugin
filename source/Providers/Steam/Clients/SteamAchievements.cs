@@ -994,9 +994,17 @@ namespace SuccessStory.Clients
                     {
                         foreach (KeyValue AchievementsData in SchemaForGame.Children?.Find(x => x.Name == "availableGameStats").Children?.Find(x => x.Name == "achievements").Children)
                         {
-                            AllAchievements.Find(x => x.ApiName.IsEqual(AchievementsData.Name)).IsHidden = AchievementsData.Children?.Find(x => x.Name.IsEqual("hidden")).Value == "1";
-                            AllAchievements.Find(x => x.ApiName.IsEqual(AchievementsData.Name)).UrlUnlocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icon")).Value;
-                            AllAchievements.Find(x => x.ApiName.IsEqual(AchievementsData.Name)).UrlLocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icongray")).Value;
+                            Achievements ExistingData = AllAchievements.Find(x => x.ApiName.IsEqual(AchievementsData.Name));
+                            if (ExistingData != null)
+                            {
+                                ExistingData.IsHidden = AchievementsData.Children?.Find(x => x.Name.IsEqual("hidden")).Value == "1";
+
+                                ExistingData.UrlUnlocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icon")).Value;
+                                if (ExistingData.UrlUnlocked?.EndsWith("/") ?? true) ExistingData.UrlUnlocked = null;
+
+                                ExistingData.UrlLocked = AchievementsData.Children?.Find(x => x.Name.IsEqual("icongray")).Value;
+                                if (ExistingData.UrlLocked?.EndsWith("/") ?? true) ExistingData.UrlLocked = ExistingData.UrlUnlocked;
+                            }
                         }
                     }
                     catch (Exception ex)
