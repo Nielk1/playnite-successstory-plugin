@@ -127,29 +127,63 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <!-- Compile Providers\* -->
     <Compile Include="Providers\BattleNet\Clients\BattleNetAchievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\OverwatchAchievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\Starcraft2Achievements.cs" />
+    <Compile Include="Providers\BattleNet\Clients\WowAchievements.cs" />
+    <Compile Include="Providers\BattleNet\Models\BattleNetSc2Ach.cs" />
+    <Compile Include="Providers\BattleNet\Models\BattleNetSc2Profil.cs" />
+    <Compile Include="Providers\BattleNet\Models\WowAchievementsData.cs" />
+    <Compile Include="Providers\BattleNet\Models\WowRegionResult.cs" />
+    <Compile Include="Providers\BattleNet\Views\Interfaces\OverwatchCareerStats.xaml.cs">
+      <DependentUpon>OverwatchCareerStats.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Providers\BattleNet\Views\Interfaces\OverwatchStats.xaml.cs">
+      <DependentUpon>OverwatchStats.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Providers\BattleNet\Views\SuccessStoryOverwatchView.xaml.cs">
+      <DependentUpon>SuccessStoryOverwatchView.xaml</DependentUpon>
+    </Compile>
+    <Page Include="Providers\BattleNet\Views\Interfaces\OverwatchCareerStats.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Providers\BattleNet\Views\Interfaces\OverwatchStats.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Providers\BattleNet\Views\SuccessStoryOverwatchView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Providers\EA\Clients\OriginAchievements.cs" />
     <Compile Include="Providers\Epic\Clients\EpicAchievements.cs" />
     <Compile Include="Providers\Exophase\Clients\ExophaseAchievements.cs" />
-    <Compile Include="Clients\GenericAchievements.cs" />
-    <Compile Include="Providers\GenshinImpact\Clients\GenshinImpactAchievements.cs" />
-    <Compile Include="Providers\GuildWars2\Clients\GuildWars2Achievements.cs" />
-    <Compile Include="Controls\AchievmentProviderRadioButton.xaml.cs">
-      <DependentUpon>AchievmentProviderRadioButton.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Models\AchievementHandler.cs" />
-    <Compile Include="Providers\GenshinImpact\Models\GenshinImpactAchievementsCategory.cs" />
+    <Compile Include="Providers\Exophase\Models\ExophaseSearchResult.cs" />
     <Compile Include="Providers\GOG\Clients\GogAchievements.cs" />
-    <Compile Include="Providers\EA\Clients\OriginAchievements.cs" />
-    <Compile Include="Providers\BattleNet\Clients\OverwatchAchievements.cs" />
+    <Compile Include="Providers\GenshinImpact\Clients\GenshinImpactAchievements.cs" />
+    <Compile Include="Providers\GenshinImpact\Models\GenshinImpactAchievementData.cs" />
+    <Compile Include="Providers\GenshinImpact\Models\GenshinImpactAchievementsCategory.cs" />
+    <Compile Include="Providers\GuildWars2\Clients\GuildWars2Achievements.cs" />
+    <Compile Include="Providers\GuildWars2\Models\GW2Achievements.cs" />
+    <Compile Include="Providers\GuildWars2\Models\GW2AchievementsGroups.cs" />
+    <Compile Include="Providers\GuildWars2\Models\GW2OwnedAchievements.cs" />
     <Compile Include="Providers\PSN\Clients\PSNAchievements.cs" />
-    <Compile Include="Providers\RetroAchievements\Clients\RetroAchievements.cs" />
+    <Compile Include="Providers\PSN\Models\PSN_NPWR_LIST.cs" />
     <Compile Include="Providers\RPCS3\Clients\Rpcs3Achievements.cs" />
-    <Compile Include="Providers\BattleNet\Clients\Starcraft2Achievements.cs" />
+    <Compile Include="Providers\RetroAchievements\Clients\RetroAchievements.cs" />
+    <Compile Include="Providers\RetroAchievements\Services\NDS.cs" />
     <Compile Include="Providers\Steam\Clients\SteamAchievements.cs" />
     <Compile Include="Providers\Steam\Clients\SteamEmulators.cs" />
     <Compile Include="Providers\TrueAchievements\Clients\TrueAchievements.cs" />
-    <Compile Include="Providers\BattleNet\Clients\WowAchievements.cs" />
     <Compile Include="Providers\Xbox\Clients\XboxAchievements.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Compile Controls\* -->
+    <Compile Include="Controls\AchievmentProviderRadioButton.xaml.cs">
+      <DependentUpon>AchievmentProviderRadioButton.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\Customs\AchievementImage.xaml.cs">
       <DependentUpon>AchievementImage.xaml</DependentUpon>
     </Compile>
@@ -177,31 +211,49 @@
     <Compile Include="Controls\PluginViewItem.xaml.cs">
       <DependentUpon>PluginViewItem.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\AchievmentProviderRadioButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\Customs\AchievementImage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginChart.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginCompact.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginCompactList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginProgressBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginUserStats.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\PluginViewItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Compile Include="Clients\GenericAchievements.cs" />
     <Compile Include="Converters\Crc32.cs" />
     <Compile Include="Converters\SetColorConverter.cs" />
-    <Compile Include="Models\Achievements.cs" />
-    <Compile Include="Models\AchRaretyStats.cs" />
-    <Compile Include="Providers\BattleNet\Models\BattleNetSc2Ach.cs" />
-    <Compile Include="Providers\BattleNet\Models\BattleNetSc2Profil.cs" />
-    <Compile Include="Providers\Exophase\Models\ExophaseSearchResult.cs" />
-    <Compile Include="Models\GameStats.cs" />
-    <Compile Include="Providers\GenshinImpact\Models\GenshinImpactAchievementData.cs" />
-    <Compile Include="Providers\GuildWars2\Models\GW2Achievements.cs" />
-    <Compile Include="Providers\GuildWars2\Models\GW2AchievementsGroups.cs" />
-    <Compile Include="Providers\GuildWars2\Models\GW2OwnedAchievements.cs" />
-    <Compile Include="Models\ListAchievements.cs" />
-    <Compile Include="Models\ListAll.cs" />
-    <Compile Include="Models\ListGames.cs" />
-    <Compile Include="Models\ProgressionAchievements.cs" />
-    <Compile Include="Models\GameAchievements.cs" />
-    <Compile Include="Providers\PSN\Models\PSN_NPWR_LIST.cs" />
-    <Compile Include="Models\QuickSearchItemSource.cs" />
-    <Compile Include="Models\RaConsoleAssociated.cs" />
-    <Compile Include="Models\SearchResult.cs" />
-    <Compile Include="Models\SuccessStoryCollection.cs" />
-    <Compile Include="Providers\BattleNet\Models\WowAchievementsData.cs" />
-    <Compile Include="Models\CbData.cs" />
-    <Compile Include="Providers\BattleNet\Models\WowRegionResult.cs" />
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Controls\ComboBoxRemovable.xaml.cs">
       <DependentUpon>ComboBoxRemovable.xaml</DependentUpon>
     </Compile>
@@ -240,17 +292,10 @@
     <Compile Include="playnite-plugincommon\CommonPluginsControls\Views\OptionsDownloadData.xaml.cs">
       <DependentUpon>OptionsDownloadData.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Providers\RetroAchievements\Services\NDS.cs" />
     <Compile Include="Services\SuccessStoryDatabase.cs" />
     <Compile Include="Services\SuccessStorySearch.cs" />
     <Compile Include="SuccessStory.cs" />
     <Compile Include="SuccessStorySettings.cs" />
-    <Compile Include="Providers\BattleNet\Views\Interfaces\OverwatchCareerStats.xaml.cs">
-      <DependentUpon>OverwatchCareerStats.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Providers\BattleNet\Views\Interfaces\OverwatchStats.xaml.cs">
-      <DependentUpon>OverwatchStats.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\Interfaces\SettingsOrderAchievement.xaml.cs">
       <DependentUpon>SettingsOrderAchievement.xaml</DependentUpon>
     </Compile>
@@ -265,9 +310,6 @@
     </Compile>
     <Compile Include="Views\SuccessStoryOneGameView.xaml.cs">
       <DependentUpon>SuccessStoryOneGameView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Providers\BattleNet\Views\SuccessStoryOverwatchView.xaml.cs">
-      <DependentUpon>SuccessStoryOverwatchView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\SuccessStorySettingsView.xaml.cs">
       <DependentUpon>SuccessStorySettingsView.xaml</DependentUpon>
@@ -383,46 +425,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Page Include="Controls\AchievmentProviderRadioButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\Customs\AchievementImage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginChart.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginCompact.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginCompactList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginList.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginProgressBar.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginUserStats.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Controls\PluginViewItem.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="playnite-plugincommon\CommonPluginsControls\Controls\ComboBoxRemovable.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -471,14 +473,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Providers\BattleNet\Views\Interfaces\OverwatchCareerStats.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Providers\BattleNet\Views\Interfaces\OverwatchStats.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\Interfaces\SettingsOrderAchievement.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -499,10 +493,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Providers\BattleNet\Views\SuccessStoryOverwatchView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Views\SuccessStorySettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -513,24 +503,121 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
+      <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
+      <Name>CommonPluginsResources</Name>
+      <Private>True</Private>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- \*. some lone files in source -->
     <None Include="icon.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Models\AchievementHandler.cs" />
+    <Compile Include="Models\Achievements.cs" />
+    <Compile Include="Models\AchRaretyStats.cs" />
+    <Compile Include="Models\GameStats.cs" />
+    <Compile Include="Models\ListAchievements.cs" />
+    <Compile Include="Models\ListAll.cs" />
+    <Compile Include="Models\ListGames.cs" />
+    <Compile Include="Models\ProgressionAchievements.cs" />
+    <Compile Include="Models\GameAchievements.cs" />
+    <Compile Include="Models\QuickSearchItemSource.cs" />
+    <Compile Include="Models\RaConsoleAssociated.cs" />
+    <Compile Include="Models\SearchResult.cs" />
+    <Compile Include="Models\SuccessStoryCollection.cs" />
+    <Compile Include="Models\CbData.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\QuickSearchSDK.Attributes.dll" />
+    <None Include="Resources\QuickSearchSDK.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Resources\*.png -->
     <None Include="Resources\badge.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\badge_bw.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\badge_flat.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\command-line.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\default_icon.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\hidden_trophy.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\percent.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\star.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\time.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
+    <!-- Resources\Overwatch\* -->
+    <None Include="Resources\Overwatch\Endorsement_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Overwatch\Endorsement_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Overwatch\Endorsement_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Overwatch\Endorsement_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\Overwatch\Endorsement_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Resources\GenshinImpact\* -->
+    <None Include="Resources\GenshinImpact\ac.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_4.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_5.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_6.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_7.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_8.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_9.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Resources\GenshinImpact\ac_10.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -588,104 +675,13 @@
     <None Include="Resources\GenshinImpact\ac_28.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Resources\GenshinImpact\ac_3.png">
+    <None Include="Resources\GenshinImpact\ac_29.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\GenshinImpact\ac_30.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\GenshinImpact\ac_31.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_5.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_6.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_7.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_8.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_9.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\hidden_trophy.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="playnite-plugincommon\CommonPluginsResources\CommonPluginsResources.csproj">
-      <Project>{4effe926-9c64-4750-a399-f344710edc09}</Project>
-      <Name>CommonPluginsResources</Name>
-      <Private>True</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Overwatch\Endorsement_1.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\Overwatch\Endorsement_2.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\Overwatch\Endorsement_3.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\Overwatch\Endorsement_4.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\Overwatch\Endorsement_5.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\default_icon.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\command-line.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\QuickSearchSDK.Attributes.dll" />
-    <None Include="Resources\QuickSearchSDK.dll" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\star.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GenshinImpact\ac_1.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_2.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\GenshinImpact\ac_4.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GenshinImpact\ac.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\percent.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="Resources\time.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\GenshinImpact\ac_29.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Resources\GenshinImpact\ac_32.png">
@@ -709,8 +705,16 @@
     <None Include="Resources\GenshinImpact\ac_38.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Resources\GenshinImpact\ac_39.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_40.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Resources\GenshinImpact\ac_41.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="playnite-plugincommon\CommonPlayniteShared\CommonPlayniteShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsShared\CommonPluginsShared.projitems" Label="Shared" />
   <Import Project="playnite-plugincommon\CommonPluginsStores\CommonPluginsStores.projitems" Label="Shared" />
