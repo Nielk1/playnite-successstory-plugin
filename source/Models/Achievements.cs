@@ -124,20 +124,28 @@ namespace SuccessStory.Models
         {
             get
             {
-                if (IsUnlock)
+                try
                 {
-                    return false;
-                }
-                else
-                {
-                    if (UrlLocked != null && (UrlLocked.Contains("steamcdn-a.akamaihd.net") && UrlLocked.Length < 75))
+                    if (IsUnlock)
                     {
-                        return true;
+                        return false;
                     }
                     else
                     {
-                        return (UrlLocked.IsNullOrEmpty() || UrlLocked == UrlUnlocked);
+                        if (UrlLocked != null && UrlLocked.Contains("steamcdn-a.akamaihd.net") && UrlLocked.Length < 75)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            return UrlLocked.IsNullOrEmpty() || !UrlUnlocked.IsNullOrEmpty() || UrlLocked == UrlUnlocked;
+                        }
                     }
+                }
+                catch (Exception ex)
+                {
+                    Common.LogError(ex, false);
+                    return false;
                 }
             }
         }
