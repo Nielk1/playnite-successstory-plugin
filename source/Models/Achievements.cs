@@ -54,6 +54,7 @@ namespace SuccessStory.Models
         [DontSerialize]
         public string ImageUnlocked
         {
+            // TODO refactor out tight coupling
             get
             {
                 string TempUrlUnlocked = UrlUnlocked;
