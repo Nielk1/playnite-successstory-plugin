@@ -89,6 +89,7 @@ namespace SuccessStory.Models
         [DontSerialize]
         public string ImageLocked
         {
+            // TODO tight coupling?
             get
             {
                 if (UrlLocked != null && (UrlLocked.Contains("steamcdn-a.akamaihd.net") && UrlLocked.Length < 75))
