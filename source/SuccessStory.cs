@@ -1263,7 +1263,7 @@ namespace SuccessStory
                 Common.LogError(ex, false);
             }
 
-
+            // TODO this is called even if RetroAchivements is not configured, and is a static function so it can't check IsConfigured, refactor
             // Initialize list console for RA
             if (PluginSettings.Settings.RaConsoleAssociateds?.Count == 0)
             {
