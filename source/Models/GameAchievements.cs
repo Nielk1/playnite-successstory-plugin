@@ -274,6 +274,7 @@ namespace SuccessStory.Models
 
         /// <summary>
         /// Indicate if the achievements have added manualy.
+        /// What this seems to actually do is prevent automatic updating of achivement data.
         /// </summary>
         public bool IsManual { get; set; }
 

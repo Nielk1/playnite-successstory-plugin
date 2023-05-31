@@ -236,12 +236,13 @@ namespace SuccessStory.Services
                 // Generate database only this source
                 if (VerifToAddOrShow(Plugin, PlayniteApi, PluginSettings.Settings, game))
                 {
-                    RetroAchievements retroAchievementsProvider = achievementProvider as RetroAchievements;
-                    PSNAchievements psnAchievementsProvider = achievementProvider as PSNAchievements;
+                    //RetroAchievements retroAchievementsProvider = achievementProvider as RetroAchievements;
+                    //PSNAchievements psnAchievementsProvider = achievementProvider as PSNAchievements;
 
                     logger.Info($"Used {achievementProvider.GetType()} for {game?.Name} - {game?.Id}");
 
-                    if (retroAchievementsProvider != null && !SuccessStory.IsFromMenu)
+                    // TODO This code doesn't seem to actually do anything, maybe it's just default fixing? doesn't belong here if it is
+                    /*if (retroAchievementsProvider != null && !SuccessStory.IsFromMenu)
                     {
                         // use a chached RetroAchievements game ID to skip retrieving that if possible
                         // TODO: store this with the game somehow so we don't need to get this from the achievements object
@@ -262,16 +263,16 @@ namespace SuccessStory.Services
                     else if (psnAchievementsProvider != null)
                     {
                         ((PSNAchievements)achievementProvider).CommunicationId = null;
-                    }
-
+                    }*/
 
                     gameAchievements = achievementProvider.GetAchievements(game);
 
 
-                    if (retroAchievementsProvider != null)
+                    // TODO This code doesn't seem to actually do anything, maybe it's just default fixing? doesn't belong here if it is
+                    /*if (retroAchievementsProvider != null)
                     {
                         gameAchievements.RAgameID = retroAchievementsProvider.GameId;
-                    }
+                    }*/
 
                     Common.LogDebug(true, $"Achievements for {game.Name} - {achievementProvider.GetType()} - {Serialization.ToJson(gameAchievements)}");
                 }

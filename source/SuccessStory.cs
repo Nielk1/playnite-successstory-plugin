@@ -48,7 +48,7 @@ namespace SuccessStory
         /// <summary>
         /// Static state variable, remove if possible
         /// </summary>
-        public static bool IsFromMenu { get; set; } = false;
+        //public static bool IsFromMenu { get; set; } = false;
 
 
         public SuccessStory(IPlayniteAPI api) : base(api)
@@ -445,7 +445,7 @@ namespace SuccessStory
                             Description = resources.GetString("LOCCommonRefreshGameData"),
                             Action = (gameMenuItem) =>
                             {
-                                IsFromMenu = true;
+                                //IsFromMenu = true;
 
                                 if (Ids.Count == 1)
                                 {
@@ -657,9 +657,9 @@ namespace SuccessStory
                 Description = resources.GetString("LOCCommonDownloadPluginData"),
                 Action = (mainMenuItem) =>
                 {
-                    IsFromMenu = true;
+                    //IsFromMenu = true;
                     PluginDatabase.GetSelectData();
-                    IsFromMenu = false;
+                    //IsFromMenu = false;
                 }
             });
 
@@ -1134,7 +1134,7 @@ namespace SuccessStory
                 bool VerifToAddOrShow = SuccessStoryDatabase.VerifToAddOrShow(this, PlayniteApi, PluginSettings.Settings, args.Game);
                 GameAchievements gameAchievements = PluginDatabase.Get(args.Game, true);
 
-                IsFromMenu = false;
+                //IsFromMenu = false;
 
                 if (!gameAchievements.IsIgnored)
                 {
