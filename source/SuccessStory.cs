@@ -307,6 +307,7 @@ namespace SuccessStory
                 {
                     SidebarItemControl sidebarItemControl = new SidebarItemControl(PluginDatabase.PlayniteApi);
                     sidebarItemControl.SetTitle(resources.GetString("LOCSuccessStoryAchievements"));
+                    // TODO tight coupling
                     sidebarItemControl.AddContent(new SuccessView());
 
                     return sidebarItemControl;
@@ -330,6 +331,7 @@ namespace SuccessStory
                 {
                     SidebarItemControl sidebarItemControl = new SidebarItemControl(PluginDatabase.PlayniteApi);
                     sidebarItemControl.SetTitle(resources.GetString("LOCSuccessStoryRetroAchievements"));
+                    // TODO tight coupling
                     sidebarItemControl.AddContent(new SuccessView(true));
 
                     return sidebarItemControl;
@@ -612,7 +614,7 @@ namespace SuccessStory
                     }
                 }
             };
-
+            // TODO tight coupling
             if (PluginSettings.Settings.EnableRetroAchievementsView && PluginSettings.Settings.EnableRetroAchievements)
             {
                 mainMenuItems.Add(new MainMenuItem

@@ -480,69 +480,11 @@ namespace SuccessStory.Services
             List<string> tempSourcesLabels = new List<string>();
             IEnumerable<KeyValuePair<Guid, GameAchievements>> db = Database.Items.Where(x => x.Value.IsManual);
 
-            if (PluginSettings.Settings.EnableRetroAchievementsView && PluginSettings.Settings.EnableRetroAchievements)
+            if (_isRetroachievements)
             {
-                if (_isRetroachievements)
+                if (PluginSettings.Settings.EnableRetroAchievementsView && PluginSettings.Settings.EnableRetroAchievements)
                 {
-                    if (PluginSettings.Settings.EnableRetroAchievements)
-                    {
-                        tempSourcesLabels.Add("RetroAchievements");
-                    }
-                }
-                else
-                {
-                    if (PluginSettings.Settings.EnableGog)
-                    {
-                        tempSourcesLabels.Add("GOG");
-                    }
-                    if (PluginSettings.Settings.EnableEpic)
-                    {
-                        tempSourcesLabels.Add("Epic");
-                    }
-                    if (PluginSettings.Settings.EnableSteam)
-                    {
-                        tempSourcesLabels.Add("Steam");
-                    }
-                    if (PluginSettings.Settings.EnableOrigin)
-                    {
-                        tempSourcesLabels.Add("EA app");
-                    }
-                    if (PluginSettings.Settings.EnableXbox)
-                    {
-                        tempSourcesLabels.Add("Xbox");
-                    }
-                    if (PluginSettings.Settings.EnablePsn)
-                    {
-                        tempSourcesLabels.Add("Playstation");
-                    }
-                    if (PluginSettings.Settings.EnableLocal)
-                    {
-                        tempSourcesLabels.Add("Playnite");
-                        tempSourcesLabels.Add("Hacked");
-                    }
-                    if (PluginSettings.Settings.EnableRpcs3Achievements)
-                    {
-                        tempSourcesLabels.Add("RPCS3");
-                    }
-                    if (PluginSettings.Settings.EnableSc2Achievements || PluginSettings.Settings.EnableOverwatchAchievements || PluginSettings.Settings.EnableWowAchievements)
-                    {
-                        tempSourcesLabels.Add("Battle.net");
-                    }
-                    if (PluginSettings.Settings.EnableManual)
-                    {
-                        if (db != null && db.Count() > 0)
-                        {
-                            var ListSources = db.Select(x => x.Value.SourceId).Distinct();
-                            foreach (var Source in ListSources)
-                            {
-                                var gameSource = PlayniteApi.Database.Sources.Get(Source);
-                                if (gameSource != null)
-                                {
-                                    tempSourcesLabels.Add(gameSource.Name);
-                                }
-                            }
-                        }
-                    }
+                    tempSourcesLabels.Add("RetroAchievements");
                 }
             }
             else
@@ -571,9 +513,12 @@ namespace SuccessStory.Services
                 {
                     tempSourcesLabels.Add("Playstation");
                 }
-                if (PluginSettings.Settings.EnableRetroAchievements)
+                if (!PluginSettings.Settings.EnableRetroAchievementsView || !PluginSettings.Settings.EnableRetroAchievements)
                 {
-                    tempSourcesLabels.Add("RetroAchievements");
+                    if (PluginSettings.Settings.EnableRetroAchievements)
+                    {
+                        tempSourcesLabels.Add("RetroAchievements");
+                    }
                 }
                 if (PluginSettings.Settings.EnableRpcs3Achievements)
                 {
