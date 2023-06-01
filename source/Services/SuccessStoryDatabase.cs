@@ -22,7 +22,6 @@ using System.Text.RegularExpressions;
 using static CommonPluginsShared.PlayniteTools;
 using CommonPluginsShared.Extensions;
 using System.Reflection;
-using CommonPluginsShared.Interfaces;
 
 namespace SuccessStory.Services
 {
@@ -1438,11 +1437,6 @@ namespace SuccessStory.Services
             Result.Progression = (Total != 0) ? (int)Math.Ceiling((double)(Unlocked * 100 / Total)) : 0;
 
             return Result;
-        }
-
-        public override GameAchievements Get(Game game, bool OnlyCache = false, bool Force = false)
-        {
-            return base.Get(game, OnlyCache, Force);
         }
     }
 
