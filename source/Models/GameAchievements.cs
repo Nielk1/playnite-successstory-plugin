@@ -59,11 +59,39 @@ namespace SuccessStory.Models
                 return ExtraHandlers[name].Updated[field];
             }
         }
+        private object AchievementClientLock = new object();
+        private GenericAchievements _achievementClient = null;
+        private GenericAchievements AchievementClient
+        {
+            get
+            {
+                if (Handler?.Name?.IsNullOrEmpty() ?? true)
+                    return null;
+                lock (AchievementClientLock)
+                {
+                    if (_achievementClient == null)
+                        SuccessStoryDatabase.AchievementProviders.TryGetValue(Handler.Name, out _achievementClient);
+                    return _achievementClient;
+                }
+            }
+        }
 
         private SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;
 
         private List<Achievements> _Items = new List<Achievements>();
-        public override List<Achievements> Items { get => _Items; set => SetValue(ref _Items, value); }
+        public override List<Achievements> Items
+        {
+            get
+            {
+                // abuse this as a chance to decorate the items since the deserializer has no post-decorate funtion call and that's too deep to edit
+                GenericAchievements client = AchievementClient;
+                if (client != null)
+                    _Items.ForEach(item => item.AchievementClient = AchievementClient);
+
+                return _Items;
+            }
+            set => SetValue(ref _Items, value);
+        }
 
         private List<GameStats> _ItemsStats = new List<GameStats>();
         public List<GameStats> ItemsStats { get => _ItemsStats; set => SetValue(ref _ItemsStats, value); }

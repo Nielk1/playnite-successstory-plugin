@@ -199,6 +199,13 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
+        public override string DecorateImagePath(string imagePath)
+        {
+            if (imagePath?.Contains("rpcs3", StringComparison.InvariantCultureIgnoreCase) ?? false)
+                return Path.Combine(PluginDatabase.Paths.PluginUserDataPath, imagePath);
+            return null;
+        }
+
 
         #region Configuration
         public override bool ValidateConfiguration()

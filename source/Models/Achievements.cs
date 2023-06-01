@@ -10,12 +10,16 @@ using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Documents;
 using System.Globalization;
+using SuccessStory.Clients;
 
 namespace SuccessStory.Models
 {
     public class Achievements : ObservableObject
     {
         private SuccessStoryDatabase PluginDatabase = SuccessStory.PluginDatabase;
+        
+        [DontSerialize]
+        public GenericAchievements AchievementClient = null;
 
         private string _name;
         public string Name { get =>_name; set => _name = value?.Trim(); }
@@ -48,6 +52,7 @@ namespace SuccessStory.Models
         public string CategoryRpcs3 { get; set; } = string.Empty;
 
 
+        private string _imageUnlocked = null;
         /// <summary>
         /// Image for unlocked achievement
         /// </summary>
@@ -57,22 +62,23 @@ namespace SuccessStory.Models
             // TODO refactor out tight coupling
             get
             {
+                if (_imageUnlocked != null)
+                    return _imageUnlocked;
+
+                if (AchievementClient != null)
+                {
+                    // have AchievementClient get the proper URL, cache it for later
+                    _imageUnlocked = AchievementClient.DecorateImagePath(UrlUnlocked);
+                    if (_imageUnlocked != null)
+                        return _imageUnlocked;
+                }
+
+                // bit of a hack fix for missing icons, but this might be better than hard-setting default_icon as some logic does
+                // it might be good to also add a bool for an invalid image so that themes can draw their own default
+                if (UrlUnlocked == null)
+                    return Path.Combine(PluginDatabase.Paths.PluginPath, "Resources", "default_icon.png");
+
                 string TempUrlUnlocked = UrlUnlocked;
-                if (TempUrlUnlocked?.Contains("rpcs3", StringComparison.InvariantCultureIgnoreCase) ?? false)
-                {
-                    TempUrlUnlocked = Path.Combine(PluginDatabase.Paths.PluginUserDataPath, UrlUnlocked);
-                    return TempUrlUnlocked;
-                }
-                if (TempUrlUnlocked?.Contains("hidden_trophy", StringComparison.InvariantCultureIgnoreCase) ?? false)
-                {
-                    TempUrlUnlocked = Path.Combine(PluginDatabase.Paths.PluginPath, "Resources", UrlUnlocked);
-                    return TempUrlUnlocked;
-                }
-                if (TempUrlUnlocked?.Contains("GenshinImpact", StringComparison.InvariantCultureIgnoreCase) ?? false)
-                {
-                    TempUrlUnlocked = Path.Combine(PluginDatabase.Paths.PluginPath, "Resources", UrlUnlocked);
-                    return TempUrlUnlocked;
-                }
                 if (TempUrlUnlocked?.Contains("default_icon", StringComparison.InvariantCultureIgnoreCase) ?? false)
                 {
                     TempUrlUnlocked = Path.Combine(PluginDatabase.Paths.PluginPath, "Resources", UrlUnlocked);

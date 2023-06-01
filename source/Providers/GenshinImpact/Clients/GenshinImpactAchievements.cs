@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -116,8 +117,14 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
+        public override string DecorateImagePath(string imagePath)
+        {
+            if (imagePath?.Contains("GenshinImpact", StringComparison.InvariantCultureIgnoreCase) ?? false)
+                return Path.Combine(PluginDatabase.Paths.PluginPath, "Resources", imagePath);
+            return null;
+        }
 
-        public void GetGenshinImpact(Game game)
+        private void GetGenshinImpact(Game game)
         {
             try
             {

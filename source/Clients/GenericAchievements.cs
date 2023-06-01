@@ -57,7 +57,7 @@ namespace SuccessStory.Clients
         /// <returns></returns>
         GameAchievements ApplyAchievementsFromSearchGame(Game game, SearchResult searchResult);
         /// <summary>
-        /// Refresh manual achievements, used to attach initial achievements. TODO: make this apply also when refreshing manual
+        /// Refresh manual achievements, used to attach initial achievements.
         /// </summary>
         /// <param name="game"></param>
         /// <param name="gameAchievements"></param>
@@ -199,6 +199,22 @@ namespace SuccessStory.Clients
             CachedIsConnectedResult = null;
         }
 
+        // TODO this doesn't seem to be implemented yet? Might be removable
+        public int GetRankOfThisSource(ExternalPlugin externalPlugin, SuccessStorySettings settings, Game game)
+        {
+            return 0;
+        }
+
+        /// <summary>
+        /// Decorate an image URL so Playnite can load it
+        /// </summary>
+        /// <param name="imageUrl">Path of the image, may not actually be a url</param>
+        /// <returns>null if no full path known</returns>
+        public virtual string DecorateImagePath(string imageUrl)
+        {
+            return null;
+        }
+
 
         #region Cookies
         internal List<HttpCookie> GetCookies()
@@ -317,11 +333,6 @@ namespace SuccessStory.Clients
                     NotificationType.Error
                 ));
             }
-        }
-
-        internal int GetRankOfThisSource(ExternalPlugin externalPlugin, SuccessStorySettings settings, Game game)
-        {
-            return 0;
         }
         #endregion
     }

@@ -15,6 +15,7 @@ using static CommonPluginsShared.PlayniteTools;
 using static SuccessStory.Services.SuccessStoryDatabase;
 using System.Collections.ObjectModel;
 using Playnite.SDK;
+using System.IO;
 
 namespace SuccessStory.Clients
 {
@@ -237,6 +238,12 @@ namespace SuccessStory.Clients
             return gameAchievements;
         }
 
+        public override string DecorateImagePath(string imagePath)
+        {
+            if (imagePath?.Contains("hidden_trophy", StringComparison.InvariantCultureIgnoreCase) ?? false)
+                return Path.Combine(PluginDatabase.Paths.PluginPath, "Resources", imagePath);
+            return null;
+        }
 
         #region Configuration
         public override bool ValidateConfiguration()
